@@ -18,13 +18,14 @@ class RecognitionConfig():
         self._samples_path = data["samples_path"]
         self._min_train_samples = data["min_train_samples"]
         self._corpus_path = data["corpus_path"]
+        self._temp_path = data["temp_path"]
 
     def __repr__(self):
         """
         Return a printed version
         """
-        return "%s(models path=%r, samples path=%r, min train samples=%r, corpus path=%r)" % (
-            self.__class__.__name__, self._models_path, self._samples_path, self._min_train_samples, self._corpus_path)
+        return "%s(models path=%r, samples path=%r, min train samples=%r, corpus path=%r, temp_path=%r)" % (
+            self.__class__.__name__, self._models_path, self._samples_path, self._min_train_samples, self._corpus_path, self._temp_path)
 
     @property
     def models_path(self):
@@ -53,3 +54,10 @@ class RecognitionConfig():
         Return corpus_path
         """
         return self._corpus_path
+
+    @property
+    def temp_path(self):
+        """
+        Return temp_path
+        """
+        return self._temp_path

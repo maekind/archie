@@ -84,6 +84,7 @@ def main():
     #             f"Speaker recognition finished in {(end_time - start_time)} seconds")
   
     archi = AIEngine(path.dirname(__file__))
+    archi.run()
 
     sys.exit(0)
 

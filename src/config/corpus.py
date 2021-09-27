@@ -4,6 +4,7 @@
 corpus.py - Contains the class to load the corpus
 """
 
+import json
 
 class Corpus():
     """
@@ -21,7 +22,7 @@ class Corpus():
         self._corpus = dict()
 
         with open(self._corpus_file, "r") as cfile:
-            self._corpus = cfile.read
+            self._corpus = json.load(cfile)
 
     @property
     def corpus(self):

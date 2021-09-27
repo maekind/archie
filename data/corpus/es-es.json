@@ -1,6 +1,6 @@
 {
     "presentation": "Hola, soy ARCHI. ¿En qué puedo ayudarte?",
-    "unknown_speaker": "No te conozno. ¿Cómo te llamas?",
+    "unknown_speaker": "No te conozco. ¿Cómo te llamas?",
     "statements": ["sí", "si", "claro", "vale", "okey", "bueno"],
     "negatives": ["no"]
 }

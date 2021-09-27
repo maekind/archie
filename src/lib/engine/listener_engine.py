@@ -5,7 +5,6 @@ listener_engine.py - File that contains listener class
 
 import speech_recognition as sr
 import logging
-from lib.constants import MICROPHONE_INDEX
 
 __authors__ = "Marco Espinosa"
 __license__ = "MIT License"
@@ -28,7 +27,7 @@ class Listener():
     Class to handler the listener
     """
 
-    def __init__(self, language="es-es") -> None:
+    def __init__(self, microphone_index, audio_rate, adjust_for_noise, language="es-es") -> None:
         """
         Default constructor
         """
@@ -43,6 +42,12 @@ class Listener():
         self._listener.pause_threshold = 1
         # Set microphone adjustment
         self._micro_adjustment = False
+        # Set microphone index
+        self._micro_index = microphone_index
+        # Set sample rate
+        self._audio_rate = audio_rate
+        # Set adjust for noise flag
+        self._adjust_for_noise = adjust_for_noise
 
         self._logger.info("ok")
 
@@ -52,14 +57,15 @@ class Listener():
         """
         query = ""
         try:
-            with sr.Microphone(device_index=MICROPHONE_INDEX) as source:
+            with sr.Microphone(device_index=self._micro_index) as source:
                 self._logger.info("Listenning ...")
-                # if not self._micro_adjustment:
-                #     # Set sensitivity
-                #     self._listener.adjust_for_ambient_noise(source)
+                if self._adjust_for_noise:
+                    # Set sensitivity
+                    self._listener.adjust_for_ambient_noise(source)
                 #     self._micro_adjustment = True
 
                 audio = self._listener.listen(source)
+                audio.sample_rate = self._audio_rate
                 self._logger.info("Someone said something!")
         except Exception as e:
             raise ListenerException(f"Unable to open microphone: {e}")
