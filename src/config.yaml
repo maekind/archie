@@ -1,0 +1,20 @@
+info:
+  version: '1.0.0'
+  author: 'Marco ESPINOSA'
+  license: 'MIT License'
+  file: 'config.yaml'
+  description: 'Configuration file for ARCHI AI ASR'
+
+listener:
+  language: 'es-es'
+  audio_rate: 16000
+  adjust_for_noise: False
+  microphone_index: 1
+
+recognition:
+  models_path: '../data/models'
+  samples_path: '../data/samples'
+  min_train_samples: 5
+  corpus_path: '../data/corpus'
+
+  
