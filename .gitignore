@@ -2,6 +2,7 @@
 test/
 data/models
 data/samples
+.DS_Store
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
