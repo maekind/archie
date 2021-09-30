@@ -58,3 +58,10 @@ class Corpus():
         Property negatives
         """
         return self._corpus.get("negatives")
+
+    @property
+    def activation_token(self):
+        """
+        Property activation_token
+        """
+        return self._corpus.get("activation_token")

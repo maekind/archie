@@ -84,7 +84,7 @@ class SpeakerRecognition():
             speaker = model.split("/")[-1].split(".gmm")[0].split('-')[0]
             
             self._models.append((gmm, speaker))
-            self._logger.info(f"{speaker} loaded successfully")
+            self._logger.debug(f"{speaker} loaded successfully")
 
     def force_reload(self):
         """

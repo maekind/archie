@@ -9,7 +9,10 @@ listener:
   language: 'es-es'
   audio_rate: 16000
   adjust_for_noise: False
-  microphone_index: 2
+  microphone_index: 1
+  timeout: 10
+  witai_key: "PZGXT4NFVX434GEWBI47FMKJEZXEQHEE"
+  sphinx_data_path: '../data/sphinx'
 
 recognition:
   models_path: '../data/models'

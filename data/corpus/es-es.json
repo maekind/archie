@@ -1,6 +1,8 @@
 {
-    "presentation": "Hola, soy ARCHI. ¿En qué puedo ayudarte?",
+    "activation_token": "Hola Archi",
+    "presentation": "Hola $speaker$. ¿En qué puedo ayudarte?",
     "unknown_speaker": "No te conozco. ¿Cómo te llamas?",
     "statements": ["sí", "si", "claro", "vale", "okey", "bueno"],
     "negatives": ["no"]
+    
 }

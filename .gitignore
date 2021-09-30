@@ -2,6 +2,8 @@
 test/
 data/models
 data/samples
+data/temp
+data/sphinx
 .DS_Store
 
 # Byte-compiled / optimized / DLL files

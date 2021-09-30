@@ -8,3 +8,4 @@ pyaudio
 # Portaudio: On mac "brew install portaudio"
 # For audio configuration, check here: https://pypi.org/project/SpeechRecognition/
 pyyaml
+pocketsphinx

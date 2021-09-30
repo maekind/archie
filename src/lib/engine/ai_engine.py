@@ -11,8 +11,11 @@ from os import path, walk, remove
 from lib.recognition.speaker_recognition import SpeakerRecognition
 from config.base import Configuration
 from config.corpus import Corpus
-from lib.engine.listener_engine import Listener
+from lib.engine.listener_engine import (Listener,
+                                        ListenerException, ListenerRecognizerException,
+                                        ListenerTimeoutException)
 from lib.engine.speaker_engine import Speaker
+from lib.engine.step import Step
 
 
 class AIEngine():
@@ -44,7 +47,10 @@ class AIEngine():
 
         # Initialize listener engine
         self._listener = Listener(config.listener.microphone_index,
-                                  config.listener.audio_rate, config.listener.adjust_for_noise)
+                                  config.listener.audio_rate, config.listener.adjust_for_noise,
+                                  config.listener.witai_key, config.listener.language)
+
+        self._listener_timeout = config.listener.timeout
 
         # Initialize speaker engine
         speaker_language = self._language.split(
@@ -58,49 +64,79 @@ class AIEngine():
         # Set temporary path
         self._temp_path = config.recognition.temp_path
 
-        # Set initilized to False
-        self._init = False
+        # Set to init state
+        self._state = Step.LISTENING_NOT_ACTIVE
 
     def run(self):
         """
         Function that launches engine
         """
-        # Do speaker recognition tests
-        # start_time = time.time()
-        # for root, subdirs, filenames in walk(f"../data/samples/Jon-"):
-        #     for audio_filename in filenames:
-        #         speaker = self._speaker_recognition.find_speaker(f"../data/samples/Jon-/{audio_filename}")
-        #         end_time = time.time()
-        #         self._logger.info(f"Audio: {audio_filename} | Speaker: {speaker}")
-        # self._logger.info(
-        #     f"Speaker recognition finished in {(end_time - start_time)} seconds")
-
-        # self._speaker_recognition.force_reload()
-
+        
         while(True):
-            if not self._init:
-                self._speaker.say(self._corpus_base.presentation)
-                self._init = True
-                # TODO: Set init to False after x seconds of inactivity in listenning mode
 
-            # Wait for orders
-            query, audio = self._listener.listen()
-            #temp_audio_file, fp = self._get_temp_file(audio)
-            temp_file = self._get_temp_file(audio)
-            
-            try:
-                speaker = self._speaker_recognition.find_speaker(
-                    temp_file)
-                self._speaker.say(f"Vale {speaker}")
-                # Remove file
-                remove(temp_file)
-            except Exception as e:
-                self._logger.error(e)
-                self._speaker.say(self._corpus_base.unknown_speaker)
-                # TODO: Pedir si quieres guardar el audio, guardarlo y lanzar trainning y gmm reload!
-            
-            
-            
+            if self._state == Step.LISTENING_NOT_ACTIVE:
+                try:
+                    # Wait for orders
+                    query, audio = self._listener.listen()
+                    
+                    # If activation_token:
+                    if query and query in self._corpus_base.activation_token.lower():
+                        # Create temp file for audio
+                        temp_file = self._get_temp_file(audio)
+                        try:
+                            # Try to recognize speaker
+                            speaker = self._speaker_recognition.find_speaker(
+                                temp_file)
+
+                            # Saying hello to known speaker
+                            self._speaker.say(
+                                self._corpus_base.presentation.replace("$speaker$", speaker))
+
+                            # Remove file
+                            remove(temp_file)
+
+                        except Exception as e:
+                            self._logger.warning(f"Speaker unknown: {e}")
+                            # Saying hello to unknown speaker
+                            self._speaker.say(
+                                self._corpus_base.presentation.replace("$speaker$", ""))
+
+                        # Setting new step to listening active
+                        self._state = Step.LISTENING_ACTIVE
+
+                except ListenerException as le:
+                    self._logger.error(le)
+                    raise ListenerException()
+                except ListenerRecognizerException as lre:
+                    self._logger.error(lre)
+
+            elif self._state == Step.LISTENING_ACTIVE:
+                try:
+                    # TODO: Launch timer to stop listenning and jump to LISTENING_NOT_ACTIVE
+                    # Wait for orders
+                    query, audio = self._listener.listen(
+                        timeout=self._listener_timeout)
+
+                except ListenerTimeoutException as lte:
+                    self._logger.warning(lte)
+                    # Jump to initial state
+                    self._state = Step.LISTENING_NOT_ACTIVE
+
+                except ListenerException as le:
+                    self._logger.error(le)
+                except ListenerRecognizerException as lre:
+                    self._logger.error(lre)
+
+                pass
+            elif self._state == Step.RECOGNITION:
+                pass
+            elif self._state == Step.PROCESSING:
+                pass
+            elif self._state == Step.SPEAKING:
+                pass
+            elif self._state == Step.TRAINNING:
+                pass
+
     def _get_temp_file(self, audio):
         """
         Create a temporary audio file
@@ -108,5 +144,5 @@ class AIEngine():
         audio_filename = datetime.now().strftime("%Y%m%d_%H%M%S") + ".wav"
         with open(path.join(self._temp_path, audio_filename), "wb") as temp_file:
             temp_file.write(audio.get_wav_data())
-        
+
         return path.join(self._temp_path, audio_filename)

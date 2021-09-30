@@ -83,8 +83,12 @@ def main():
     #         logger.info(
     #             f"Speaker recognition finished in {(end_time - start_time)} seconds")
   
-    archi = AIEngine(path.dirname(__file__))
-    archi.run()
+    try:
+        archi = AIEngine(path.dirname(__file__))
+        archi.run()
+    except Exception as e:
+        logger.error(e)
+        sys.exit(1)
 
     sys.exit(0)
 
