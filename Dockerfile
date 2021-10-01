@@ -8,9 +8,17 @@ LABEL maekind.archi.name="archi" \
 
 # Install  programs
 RUN apt update && apt install -y \ 
-      &&  portaudio19-dev \
-      && python-all-dev \
-      $$ python3-all-dev \
+      gcc \ 
+      swig \ 
+      libpulse-dev \ 
+      pulseaudio \  
+      libportaudio2 \ 
+      libportaudiocpp0 \ 
+      libasound-dev \
+      libsndfile1-dev \ 
+      portaudio19-dev \
+      python-all-dev \
+      python3-all-dev \
       && apt autoremove \
       && rm -Rf /var/cache/apt/* \
       && rm -Rf /var/lib/apt/lists/* 
