@@ -87,7 +87,7 @@ class Listener():
             # with open("../data/temp/audio.wav", "wb") as audio_file:
             #     audio_file.write(audio_raw)
             
-            # query = self._speech_to_text()
+            #query = self._speech_to_text()
 
             #query = self._listener.recognize_sphinx(audio, language=self._language)
             self._logger.debug(f"Someone said {query}")

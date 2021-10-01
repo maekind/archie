@@ -4,6 +4,7 @@ data/models
 data/samples
 data/temp
 data/sphinx
+data/sphinxbase-0.8
 .DS_Store
 
 # Byte-compiled / optimized / DLL files
