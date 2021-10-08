@@ -19,14 +19,14 @@ class ListenerConfig():
         self._adjust_for_noise = data["adjust_for_noise"]
         self._microphone_index = data["microphone_index"]
         self._timeout = data["timeout"]
-        self._witai_key = data["witai_key"]
+        self._sounds_path = data["sounds_path"]
 
     def __repr__(self):
         """
         Return a printed version
         """
-        return "%s(language=%r, audio rate=%r, adjust for noise=%r, microphone index=%r, timeout=%r, wit.ai key=%r" % (
-            self.__class__.__name__, self._language, self._audio_rate, self._adjust_for_noise, self._microphone_index, self._timeout, self._witai_key)
+        return "%s(language=%r, audio rate=%r, adjust for noise=%r, microphone index=%r, timeout=%r, sounds path=%r" % (
+            self.__class__.__name__, self._language, self._audio_rate, self._adjust_for_noise, self._microphone_index, self._timeout, self._sounds_path)
 
     @property
     def language(self):
@@ -64,8 +64,8 @@ class ListenerConfig():
         return self._timeout
 
     @property
-    def witai_key(self):
+    def sounds_path(self):
         """
-        Return witai_key
+        Return sounds_path
         """
-        return self._witai_key
+        return self._sounds_path

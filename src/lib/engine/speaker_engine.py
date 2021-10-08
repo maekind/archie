@@ -27,7 +27,7 @@ class Speaker():
     Class to handler the speaker
     """
 
-    def __init__(self, language, rate=10, gender='VoiceGenderFemale') -> None:
+    def __init__(self, language, rate=50, gender='VoiceGenderFemale') -> None:
         """
         Default constructor
         """

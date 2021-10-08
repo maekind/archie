@@ -16,6 +16,7 @@ from lib.engine.listener_engine import (Listener,
                                         ListenerTimeoutException)
 from lib.engine.speaker_engine import Speaker
 from lib.engine.step import Step
+from lib.actions.rae import RaeInterface
 
 
 class AIEngine():
@@ -48,7 +49,7 @@ class AIEngine():
         # Initialize listener engine
         self._listener = Listener(config.listener.microphone_index,
                                   config.listener.audio_rate, config.listener.adjust_for_noise,
-                                  config.listener.witai_key, config.listener.language)
+                                  config.listener.sounds_path, config.listener.language)
 
         self._listener_timeout = config.listener.timeout
 
@@ -71,16 +72,20 @@ class AIEngine():
         """
         Function that launches engine
         """
-        
+        # Initialize what archi says variable
+        ai_says = ""
+        play = True
+
         while(True):
 
             if self._state == Step.LISTENING_NOT_ACTIVE:
+                self._logger.debug(f"Step: LISTENING_NOT_ACTIVE")
                 try:
                     # Wait for orders
-                    query, audio = self._listener.listen()
-                    
+                    query, audio = self._listener.listen(play_sound=False)
+
                     # If activation_token:
-                    if query and query in self._corpus_base.activation_token.lower():
+                    if query and query.lower() in self._corpus_base.activation_tokens:
                         # Create temp file for audio
                         temp_file = self._get_temp_file(audio)
                         try:
@@ -103,6 +108,10 @@ class AIEngine():
 
                         # Setting new step to listening active
                         self._state = Step.LISTENING_ACTIVE
+                    else:
+                        self._logger.warning("Activation token not found!")
+                        self._logger.warning(
+                            "Archi speaking: 'For activation say \"Hola Archi\"'")
 
                 except ListenerException as le:
                     self._logger.error(le)
@@ -111,11 +120,14 @@ class AIEngine():
                     self._logger.error(lre)
 
             elif self._state == Step.LISTENING_ACTIVE:
+                self._logger.debug(f"Step: LISTENING_ACTIVE")
                 try:
-                    # TODO: Launch timer to stop listenning and jump to LISTENING_NOT_ACTIVE
                     # Wait for orders
                     query, audio = self._listener.listen(
-                        timeout=self._listener_timeout)
+                        timeout=self._listener_timeout,
+                        play_sound=play)
+
+                    self._state = Step.PROCESSING
 
                 except ListenerTimeoutException as lte:
                     self._logger.warning(lte)
@@ -129,12 +141,37 @@ class AIEngine():
 
                 pass
             elif self._state == Step.RECOGNITION:
+                self._logger.debug(f"Step: RECOGNITION")
                 pass
             elif self._state == Step.PROCESSING:
-                pass
+                self._logger.debug(f"Step: PROCESSING")
+                found = False
+                self._logger.info(f"Searching for action in {query}")
+                # Serching for query in defined actions
+                for key, action in self._corpus_base.actions.items():
+                    if key in query.lower():
+                        found = True
+                        self._logger.info(f"Action {action} found!")
+                        self._launch_action(action, query)
+                        # Jump to listenning active state
+                        self._state = Step.LISTENING_ACTIVE
+                        play = False
+
+                if not found:
+                    self._logger.warning(f"Action {action} not found!")
+                    ai_says = self._corpus_base.unknown_action
+                    self._state = Step.SPEAKING
+
             elif self._state == Step.SPEAKING:
-                pass
+                self._logger.debug(f"Step: SPEAKING")
+                self._logger.info(f"AI speaking...")
+                # ai says something
+                self._speaker.say(ai_says)
+                # Jump to listenning active state
+                self._state = Step.LISTENING_ACTIVE
+
             elif self._state == Step.TRAINNING:
+                self._logger.debug(f"Step: TRAINNING")
                 pass
 
     def _get_temp_file(self, audio):
@@ -146,3 +183,60 @@ class AIEngine():
             temp_file.write(audio.get_wav_data())
 
         return path.join(self._temp_path, audio_filename)
+
+    def _launch_action(self, action, query):
+        """
+        Method to launch defined actions
+        """
+
+        if action == "rae":
+            self._logger.debug("rae action detected!")
+            self._rae_action(query)
+            
+    def _rae_action(self, query):
+        """
+        Method to launch RAE IA engine
+        """
+        rae = RaeInterface()
+        definitions = rae.search(query.split(' ')[-1])
+
+        if definitions is not None:
+            self._logger.debug(f"definitions: {definitions}")
+
+            # Say definition found
+            self._speaker.say(self._corpus_base.found)
+            definitions_count = len(definitions)
+            definitions_said = 0
+            next = True
+
+            self._logger.debug(
+                f"Number of definitions: {definitions_count}")
+
+            # Iterate definitions
+            for definition in definitions:
+                # Tell definition
+                if next:
+                    self._speaker.say(definition.get("definition"))
+                    definitions_said += 1
+                    # If there are more defintions:
+                    if definitions_said < definitions_count:
+                        # Question if ai continues telling definitions
+                        self._speaker.say(
+                            self._corpus_base.more_definitions)
+
+                        query, _ = self._listener.listen()
+                        # Checking for a statement in query
+                        for word in query.split(' '):
+                            next = False
+                            if word in self._corpus_base.statements:
+                                next = True
+                                break
+                else:
+                    # No more defintions ...
+                    self._speaker.say(
+                            self._corpus_base.ok)
+                    break        
+        # Word not found or error
+        else:
+           self._speaker.say(
+                            self._corpus_base.nothing_found) 

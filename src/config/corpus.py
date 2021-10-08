@@ -60,8 +60,51 @@ class Corpus():
         return self._corpus.get("negatives")
 
     @property
-    def activation_token(self):
+    def activation_tokens(self):
         """
         Property activation_token
         """
-        return self._corpus.get("activation_token")
+        return self._corpus.get("activation_tokens")
+
+    @property
+    def actions(self):
+        """
+        Property actions
+        """
+        return self._corpus.get("actions")
+
+    @property
+    def unknown_action(self):
+        """
+        Property unknown_action
+        """
+        return self._corpus.get("unknown_action")
+
+    @property
+    def found(self):
+        """
+        Property found
+        """
+        return self._corpus.get("found")
+
+    @property
+    def more_definitions(self):
+        """
+        Property more_definitions
+        """
+        return self._corpus.get("more_definitions")
+
+    @property
+    def nothing_found(self):
+        """
+        Property nothing_found
+        """
+        return self._corpus.get("nothing_found")
+
+    @property
+    def ok(self):
+        """
+        Property ok
+        """
+        return self._corpus.get("ok")
+

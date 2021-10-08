@@ -1,8 +1,39 @@
 {
-    "activation_token": "Hola Archi",
+    "activation_tokens": ["hola archi", "hola archie"],
     "presentation": "Hola $speaker$. ¿En qué puedo ayudarte?",
     "unknown_speaker": "No te conozco. ¿Cómo te llamas?",
-    "statements": ["sí", "si", "claro", "vale", "okey", "bueno"],
-    "negatives": ["no"]
+    "unknown_action": "Lo siento, no te he entendido",
+    "found": "Esto es lo que he encontrado",
+    "more_definitions": "¿Quieres oir la siguiente?",
+    "nothing_found": "Lo siento, no he encontrado nada",
+    "statements": ["sí", "si", "claro", "vale", "okey", "okay", "bueno"],
+    "negatives": ["no"],
+    "ok": "Vale",
+    "articles":{
+        "feminin":{
+            "singular":{
+                "undefined": "una",
+                "defiend" : "la"
+            },
+            "plural":{
+                "undefined": "unas",
+                "defiend" : "las"
+            }
+        },
+        "masculin":{
+            "singular":{
+                "undefined": "un",
+                "defiend" : "el"
+            },
+            "plural":{
+                "undefined": "unos",
+                "defiend" : "los"
+            }
+        }
+    },
+    "actions":{
+        "que significa": "rae",
+        "qué significa": "rae"
+    }
     
 }

@@ -1,4 +1,4 @@
-# Archi assistan
+# Archi assistant
 FROM python:slim
 LABEL maekind.archi.name="archi" \
       maekind.archi.maintainer="Marco Espinosa" \
@@ -12,6 +12,7 @@ RUN apt update && apt install -y \
       swig \ 
       libpulse-dev \ 
       pulseaudio \  
+      pulseaudio-utils \ 
       libportaudio2 \ 
       libportaudiocpp0 \ 
       libasound-dev \
@@ -23,13 +24,18 @@ RUN apt update && apt install -y \
       && rm -Rf /var/cache/apt/* \
       && rm -Rf /var/lib/apt/lists/* 
 
-
 # Change working dir to app and copy requirements
 WORKDIR /app
 COPY requirements.txt requirements.txt
 
+COPY client.conf /etc/pulse/client.conf
+
 # Install requirements
 RUN pip3 install -r requirements.txt
+
+RUN apt update && apt install -y alsa-utils alsa-tools libasound2 libasound2-dev
+
+COPY alsa.conf /usr/share/alsa/alsa.conf
 
 # Copy application into app dir
 #COPY ./src/*.* .
@@ -39,7 +45,7 @@ RUN pip3 install -r requirements.txt
 ENV PATH="/app/archi/src:${PATH}"
 
 # Entry command for docker image
-ENTRYPOINT [ "main.py" ]
+ENTRYPOINT [ "/bin/bash" ]
 
 
 
