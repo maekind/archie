@@ -2,14 +2,29 @@
 
 """
 weather.py - open weather inteface to make online queries for forcasting
+It includes the following classes:
++ WeatherInterface -> Main class that returns a WeatherInfoList
++ WeatherInterfaceRequestException
++ WeatherInfoItem
++ WeatherInfoList
 """
 
 import logging
+from typing import List
+from datetime import datetime
 import requests
+import json
+
 
 class WeatherInterfaceRequestException(Exception):
     """ Custom Request Exception for Weather Interface """
+    # Setting custom message
     message = "Weather request error. Code 404"
+
+
+class WeatherInfoList(List):
+    """ Class to handle a list of WeatherInfo items """
+
 
 class WeatherInterface():
     """
@@ -18,7 +33,7 @@ class WeatherInterface():
 
     _base_url = "http://api.openweathermap.org/data/2.5/weather?q={}&appid={}&lang={}&units=metric"
     _onecall_url = "https://api.openweathermap.org/data/2.5/onecall?lat={}&lon={}&exclude=hourly,minutely,alerts&appid={}&lang={}&units=metric"
-     #one call: https://api.openweathermap.org/data/2.5/onecall?lat=41.725&lon=1.8266&exclude=hourly,minutely,alerts&appid=30524e1493576ced69c16d9831731363
+    #one call: https://api.openweathermap.org/data/2.5/onecall?lat=41.725&lon=1.8266&exclude=hourly,minutely,alerts&appid=30524e1493576ced69c16d9831731363
     # example 1:
     #{
     #   "coord":{"lon":1.8266,"lat":41.725},
@@ -52,9 +67,11 @@ class WeatherInterface():
         """
         Default constructor
         """
+        # Set logger instance name
         self._logger = logging.getLogger("Weather interface")
+
         # Set base url with parameters
-        self._base_url = format(self._base_url, city, key, language)
+        self._base_url = self._base_url.format(city, key, language)
 
         # Set api key
         self._key = key
@@ -62,78 +79,324 @@ class WeatherInterface():
         # Set language
         self._language = language
 
-    def search(self, when="today"):
-        """
-        Method to search the weather info
-        """
-        # call api
-        response = requests.get(self._base_url)
-        # get json response
-        json_data = response.json()
-        # Initialize weather info instance
-        weather_info = WeatherInfo()
+        # Set city
+        self._city = city
 
-        # Check for request error
-        if json_data["cod"] != "404":
+    def search(self, when="today") -> WeatherInfoList:
+        """
+        Method to request the weather info
+        Returns an instance of WeatherInfoList with items of type WeatherInfoItem
+        """
+        self._logger.debug(f"Request coordinates for {self._city}")
+        try:
+            # call api
+            response = requests.get(self._base_url)
+            # get json response
+            json_data = response.json()
+            # Initialize weather info list
+            weather_info_list = WeatherInfoList()
+
             # Get coordinates for one call
             latitude = json_data["coord"].get("lat")
             longitude = json_data["coord"].get("lon")
-            
+
+            self._logger.debug(
+                f"{self._city}: lat({latitude}) lon({longitude})")
+
+            self._logger.debug("Request for weather")
             # Formatting one call request
-            self._onecall_url = format(self._onecall_url, latitude, longitude, self._key, self._language)
-            
+            self._onecall_url = self._onecall_url.format(
+                latitude, longitude, self._key, self._language)
+
             # call api
             response = requests.get(self._onecall_url)
 
             # get json response
             json_data = response.json()
+            # get current weather
+            current = json_data.get("current")
+            weather_current = WeatherInfoCurrent()
+            weather_current.city = self._city
+            weather_current.temperature = current.get("temp")
+            weather_current.feels_like = current.get("feels_like")
+            weather_current.pressure = current.get("pressure")
+            weather_current.humidity = current.get("humidity")
+            weather_current.wind_speed = current.get("wind_speed")
+            weather_current.humidity = current.get("humidity")
+            weather_current.clouds_percentage = current.get("clouds")
+            weather_current.weather_main = current.get("weather")[
+                0].get("main")
+            weather_current.weather_description = current.get("weather")[
+                0].get("description")
+            # save current to weather list
+            weather_info_list.append(weather_current)
 
-            # Check for request error
-            if json_data["cod"] != "404":
-                main = json_data["main"]
-                weather = json_data["weather"][0]
-                wind = json_data["wind"]
+            daily_list = json_data.get("daily")
 
-            else:
-                raise WeatherInterfaceRequestException()
-            
-        else:
+            # iter daily list
+            for day in daily_list:
+                weather_day = WeatherInfoDay()
+                weather_day.city = self._city
+                weather_day.day = day.get("dt")
+                weather_day.temperature = day.get("temp").get("day")
+                weather_day.min_temperature = day.get("temp").get("min")
+                weather_day.max_temperature = day.get("temp").get("max")
+                weather_day.feels_like = day.get("feels_like").get("day")
+                weather_day.pressure = day.get("pressure")
+                weather_day.humidity = day.get("humidity")
+                weather_day.wind_speed = day.get("wind_speed")
+                weather_day.weather_main = current.get("weather")[
+                    0].get("main")
+                weather_day.weather_description = current.get(
+                    "weather")[0].get("description")
+                weather_day.clouds_percentage = current.get("clouds")
+
+                # save day to weather list
+                weather_info_list.append(weather_day)
+
+        except Exception:
             raise WeatherInterfaceRequestException()
-        
-              
-        return weather_info
 
-class WeatherInfo():
+        return weather_info_list
+
+
+class WeatherInfoItem():
     """
     Class to store response from request
     """
 
     _city = ""
-    _description = ""
-    _current_temperature = 0
+    _weather_main = ""
+    _weather_description = ""
+    _temperature = 0
     _feels_like = 0
-    _min_temperature = 0
-    _max_temperature = 0
     _pressure = 0
     _humidity = 0
     _wind_speed = 0
     _clouds_percentage = 0
 
     @property
-    def current_temperature(self):
+    def city(self):
         """
-        Property current temperature
+        Property city
         """
-        return self._current_temperature
+        return self._city
 
-    @current_temperature.setter
-    def current_temperaure(self, value):
+    @city.setter
+    def city(self, value):
         """
-        Setter for current temperature
+        Setter for city
         """
-        self._current_temperature = value
+        self._city = value
+
+    @property
+    def weather_main(self):
+        """
+        Property weather_main
+        """
+        return self._weather_main
+
+    @weather_main.setter
+    def weather_main(self, value):
+        """
+        Setter for weather_main
+        """
+        self._weather_main = value
+
+    @property
+    def weather_description(self):
+        """
+        Property weather_description
+        """
+        return self._weather_description
+
+    @weather_description.setter
+    def weather_description(self, value):
+        """
+        Setter for weather_description
+        """
+        self._weather_description = value
+
+    @property
+    def temperature(self):
+        """
+        Property temperature
+        """
+        return self._temperature
+
+    @temperature.setter
+    def temperature(self, value):
+        """
+        Setter for temperature
+        """
+        self._temperature = value
+
+    @property
+    def feels_like(self):
+        """
+        Property feels_like
+        """
+        return self._feels_like
+
+    @feels_like.setter
+    def feels_like(self, value):
+        """
+        Setter for feels_like
+        """
+        self._feels_like = value
+
+    @property
+    def pressure(self):
+        """
+        Property pressure
+        """
+        return self._pressure
+
+    @pressure.setter
+    def pressure(self, value):
+        """
+        Setter for pressure
+        """
+        self._pressure = value
+
+    @property
+    def humidity(self):
+        """
+        Property humidity
+        """
+        return self._humidity
+
+    @humidity.setter
+    def humidity(self, value):
+        """
+        Setter for humidity
+        """
+        self._humidity = value
+
+    @property
+    def wind_speed(self):
+        """
+        Property wind_speed
+        """
+        return self._wind_speed
+
+    @wind_speed.setter
+    def wind_speed(self, value):
+        """
+        Setter for wind_speed
+        """
+        self._wind_speed = value
+
+    @property
+    def clouds_percentage(self):
+        """
+        Property clouds_percentage
+        """
+        return self._clouds_percentage
+
+    @clouds_percentage.setter
+    def clouds_percentage(self, value):
+        """
+        Setter for clouds_percentage
+        """
+        self._clouds_percentage = value
 
 
+class WeatherInfoCurrent(WeatherInfoItem):
+    """
+    Class to store current weather
+    """
 
-    
 
+class WeatherInfoDay(WeatherInfoItem):
+    """
+    Class to store weather for a day
+    """
+    _day = 0
+    _min_temperature = 0
+    _max_temperature = 0
+
+    def __repr__(self):
+        """
+        Return a printed version
+        """
+        return "%s(\n\t%r %r\n\tmin temperature = %r ºC\n\tmax temperature = %rªC\n)" % (
+            self.__class__.__name__, self._city, datetime.utcfromtimestamp(self._day).strftime('%d/%m/%Y'), self._min_temperature, self._max_temperature)
+
+    @property
+    def day(self):
+        """
+        Property day
+        """
+        return self._day
+
+    @day.setter
+    def day(self, value):
+        """
+        Setter for day
+        """
+        self._day = value
+
+    @property
+    def min_temperature(self):
+        """
+        Property min_temperature
+        """
+        return self._min_temperature
+
+    @min_temperature.setter
+    def min_temperature(self, value):
+        """
+        Setter for min_temperature
+        """
+        self._min_temperature = value
+
+    @property
+    def max_temperature(self):
+        """
+        Property max_temperature
+        """
+        return self._max_temperature
+
+    @max_temperature.setter
+    def max_temperature(self, value):
+        """
+        Setter for max_temperature
+        """
+        self._max_temperature = value
+
+
+# Main test
+if __name__ == "__main__":
+    logargs = {
+        'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        'datefmt': '%Y-%m-%d %H:%M:%S'}
+
+    logargs["level"] = "INFO"
+
+    logging.basicConfig(**logargs)
+
+    # Get key
+    # TODO: put here your key json file with the following content:
+    # { "key": "put your 32 bytes openweather key here" }
+    with open("../../../data/conf/openweather.json", "r") as key_file:
+        key = json.loads(key_file.read()).get("key")
+
+    # Request for weather in Barcelona
+    try:
+        logging.info("Create request")
+        weather = WeatherInterface("Barcelona", key, "es")
+        weatherInfo = WeatherInfoList()
+        logging.info("Search")
+        weatherInfo = weather.search()
+
+        # Iter weather info
+        for weaterItem in weatherInfo:
+            if isinstance(weaterItem, WeatherInfoCurrent):
+                logging.debug("Weather item current")
+                pass
+            elif isinstance(weaterItem, WeatherInfoDay):
+                logging.debug("Weather item day")
+                print(weaterItem)
+    except Exception as e:
+        logging.error(e.message)
