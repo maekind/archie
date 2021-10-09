@@ -6,7 +6,9 @@ data/temp
 data/sphinx
 data/sphinxbase-0.8
 data/conf/google_cloud.json
+data/conf/openweather.json
 data/conf/readme
+@eaDir
 .DS_Store
 standalone.sh
 

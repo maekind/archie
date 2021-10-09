@@ -7,7 +7,8 @@ ai_engine.py - File that contains all ai stuff
 import logging
 import time
 from datetime import datetime
-from os import path, walk, remove
+from os import path, remove
+from lib.actions.weather import WeatherInterface
 from lib.recognition.speaker_recognition import SpeakerRecognition
 from config.base import Configuration
 from config.corpus import Corpus
@@ -64,7 +65,9 @@ class AIEngine():
 
         # Set temporary path
         self._temp_path = config.recognition.temp_path
-
+        # Set actions config instance
+        self._actions_config = config.actions
+        
         # Set to init state
         self._state = Step.LISTENING_NOT_ACTIVE
 
@@ -192,6 +195,14 @@ class AIEngine():
         if action == "rae":
             self._logger.debug("rae action detected!")
             self._rae_action(query)
+        elif action == "time":
+            self._logger.debug("time action detected!")
+            self._logger.warning("Not implemented yet!")
+            
+        elif action == "weather":
+            self._logger.debug("weather action detected!")
+            self._logger.warning("Not implemented yet!")
+            
             
     def _rae_action(self, query):
         """
@@ -240,3 +251,15 @@ class AIEngine():
         else:
            self._speaker.say(
                             self._corpus_base.nothing_found) 
+
+    def _weather_action(self, query):
+        """
+        Method to retrive weather info
+        """
+        weather = WeatherInterface(self._actions_config.openweather_key)
+        
+
+    def _time_action(self):
+        """
+        Method to get actual time
+        """

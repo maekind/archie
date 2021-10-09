@@ -9,6 +9,7 @@ from os import path
 from config.info import Info
 from config.listener import ListenerConfig
 from config.recognition import RecognitionConfig
+from config.actions import ActionsConfig
 
 
 class Configuration():
@@ -32,6 +33,7 @@ class Configuration():
         self._info = Info(config["info"])
         self._listenerConfig = ListenerConfig(config["listener"])
         self._recognitionConfig = RecognitionConfig(config["recognition"])
+        self._actionsConfig = ActionsConfig(config["actions"])
 
     @property
     def info(self):
@@ -53,3 +55,10 @@ class Configuration():
         Return recognition instance
         """
         return self._recognitionConfig
+
+    @property
+    def actions(self):
+        """
+        Return actions instance
+        """
+        return self._actionsConfig

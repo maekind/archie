@@ -20,4 +20,7 @@ recognition:
   corpus_path: '../data/corpus'
   temp_path: '../data/temp'
 
+actions:
+  openweather_key: '../data/conf/openweather.json'
+
   

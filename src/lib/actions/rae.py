@@ -16,7 +16,7 @@ class RaeInterface():
         """
         Default constructor
         """
-        self._logger = logging.getLogger("RAE action")
+        self._logger = logging.getLogger("RAE interface")
 
     def search(self, word):
         """
@@ -45,7 +45,7 @@ class RaeInterface():
                 # Save defintion into list
                 definitions.append(definition_dict)
 
-        except TypeError as e:
+        except Exception as e:
             self._logger.error(f"{word} not found!")
             return None
 
