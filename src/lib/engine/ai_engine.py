@@ -5,7 +5,6 @@ ai_engine.py - File that contains all ai stuff
 """
 
 import logging
-import time
 from datetime import datetime
 from os import path, remove
 from lib.actions.weather import WeatherInterface

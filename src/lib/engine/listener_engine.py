@@ -8,13 +8,6 @@ import speech_recognition as sr
 import logging
 from playsound import playsound
 
-__authors__ = "Marco Espinosa"
-__license__ = "MIT License"
-__version__ = "1.0"
-__maintainer__ = "Marco Espinosa"
-__email__ = "hi@marcoespinosa.es"
-__status__ = "Development"
-
 
 class ListenerRecognizerException(Exception):
     """ Custom exception for recognizer """
@@ -22,6 +15,7 @@ class ListenerRecognizerException(Exception):
 
 class ListenerException(Exception):
     """ Custom exception for listener """
+
 
 class ListenerTimeoutException(Exception):
     """ Custom exception for listener timeout """
@@ -55,7 +49,7 @@ class Listener():
         self._adjust_for_noise = adjust_for_noise
         # Set sounds path
         self._sounds_path = sounds_path
-        
+
         self._logger.info("ok")
 
     def listen(self, timeout=None, play_sound=True):
@@ -70,7 +64,7 @@ class Listener():
                     # Set sensitivity
                     self._listener.adjust_for_ambient_noise(source)
                     self._micro_adjustment = True
-                
+
                 # Play listenning sound
                 if play_sound:
                     playsound(path.join(self._sounds_path, 'listenning.mp3'))
@@ -85,7 +79,8 @@ class Listener():
         try:
             self._logger.info("Performing speech to text recognizition ...")
             #query = self._listener.recognize_google(audio, language=self._language)
-            query = self._listener.recognize_google_cloud(audio, language=self._language)
+            query = self._listener.recognize_google_cloud(
+                audio, language=self._language)
             self._logger.debug(f"Someone said {query}")
 
         except sr.RequestError as e:
@@ -93,14 +88,11 @@ class Listener():
         except sr.UnknownValueError as e:
             self._logger.error(f"Unknown value error: {e}")
         except Exception as e:
-            raise ListenerRecognizerException(f"Unable to recognize your voice: {e}")
+            raise ListenerRecognizerException(
+                f"Unable to recognize your voice: {e}")
 
         audio.sample_rate = self._audio_rate
         return query.strip(), audio
-   
-        
-
-        
 
 
 # Troubleshooting

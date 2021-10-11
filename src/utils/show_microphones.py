@@ -11,8 +11,10 @@ __license__ = "MIT License"
 __version__ = "1.0"
 __maintainer__ = "Marco Espinosa"
 __email__ = "hi@marcoespinosa.es"
-__status__ = "Development"
+__status__ = "Production"
 
+# Setting application logging level
+LOG_LEVEL = "DEBUG"
 
 def configure_logger():
     """
@@ -22,11 +24,11 @@ def configure_logger():
         'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         'datefmt': '%Y-%m-%d %H:%M:%S'}
 
-    logargs["level"] = "DEBUG"
+    logargs["level"] = LOG_LEVEL
 
     logging.basicConfig(**logargs)
 
-    return logging.getLogger("Show Microphones")
+    return logging.getLogger("Show Microphones util")
 
 
 def main():

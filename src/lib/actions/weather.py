@@ -137,11 +137,17 @@ class WeatherInterface():
             for day in daily_list:
                 weather_day = WeatherInfoDay()
                 weather_day.city = self._city
-                weather_day.day = day.get("dt")
-                weather_day.temperature = day.get("temp").get("day")
+                weather_day.timestamp = day.get("dt")
+                weather_day.day_average_temperature = day.get(
+                    "temp").get("day")
+                weather_day.night_average_temperature = day.get(
+                    "temp").get("night")
                 weather_day.min_temperature = day.get("temp").get("min")
                 weather_day.max_temperature = day.get("temp").get("max")
-                weather_day.feels_like = day.get("feels_like").get("day")
+                weather_day.day_feels_like_average_temperature = day.get(
+                    "feels_like").get("day")
+                weather_day.night_feels_like_average_temperature = day.get(
+                    "feels_like").get("night")
                 weather_day.pressure = day.get("pressure")
                 weather_day.humidity = day.get("humidity")
                 weather_day.wind_speed = day.get("wind_speed")
@@ -168,8 +174,6 @@ class WeatherInfoItem():
     _city = ""
     _weather_main = ""
     _weather_description = ""
-    _temperature = 0
-    _feels_like = 0
     _pressure = 0
     _humidity = 0
     _wind_speed = 0
@@ -216,34 +220,6 @@ class WeatherInfoItem():
         Setter for weather_description
         """
         self._weather_description = value
-
-    @property
-    def temperature(self):
-        """
-        Property temperature
-        """
-        return self._temperature
-
-    @temperature.setter
-    def temperature(self, value):
-        """
-        Setter for temperature
-        """
-        self._temperature = value
-
-    @property
-    def feels_like(self):
-        """
-        Property feels_like
-        """
-        return self._feels_like
-
-    @feels_like.setter
-    def feels_like(self, value):
-        """
-        Setter for feels_like
-        """
-        self._feels_like = value
 
     @property
     def pressure(self):
@@ -306,36 +282,75 @@ class WeatherInfoCurrent(WeatherInfoItem):
     """
     Class to store current weather
     """
+    _temperature = 0
+    _feels_like = 0
+
+    @property
+    def temperature(self):
+        """
+        Property temperature
+        """
+        return self._temperature
+
+    @temperature.setter
+    def temperature(self, value):
+        """
+        Setter for temperature
+        """
+        self._temperature = value
+
+    @property
+    def feels_like(self):
+        """
+        Property feels_like
+        """
+        return self._feels_like
+
+    @feels_like.setter
+    def feels_like(self, value):
+        """
+        Setter for feels_like
+        """
+        self._feels_like = value
 
 
 class WeatherInfoDay(WeatherInfoItem):
     """
     Class to store weather for a day
     """
-    _day = 0
+    _day_of_week = ""
+    _timestamp = 0
+    _date = None 
     _min_temperature = 0
     _max_temperature = 0
+    _day_average_temperature = 0
+    _night_average_temperature = 0
+    _day_feels_like_average_temperature = 0
+    _night_feels_like_average_temperature = 0
 
     def __repr__(self):
         """
         Return a printed version
         """
         return "%s(\n\t%r %r\n\tmin temperature = %r ºC\n\tmax temperature = %rªC\n)" % (
-            self.__class__.__name__, self._city, datetime.utcfromtimestamp(self._day).strftime('%d/%m/%Y'), self._min_temperature, self._max_temperature)
+            self.__class__.__name__, self._city, self._date, 
+            self._min_temperature, self._max_temperature)
 
     @property
-    def day(self):
+    def timestamp(self):
         """
-        Property day
+        Property timestamp
         """
-        return self._day
+        return self._timestamp
 
-    @day.setter
-    def day(self, value):
+    @timestamp.setter
+    def timestamp(self, value):
         """
-        Setter for day
+        Setter for timestamp
         """
-        self._day = value
+        self._timestamp = value
+        self._date = datetime.utcfromtimestamp(value).strftime('%d/%m/%Y')
+        self._day_of_week = datetime.utcfromtimestamp(value).weekday()
 
     @property
     def min_temperature(self):
@@ -365,6 +380,62 @@ class WeatherInfoDay(WeatherInfoItem):
         """
         self._max_temperature = value
 
+    @property
+    def day_average_temperature(self):
+        """
+        Property day_average_temperature
+        """
+        return self._day_average_temperature
+
+    @day_average_temperature.setter
+    def day_average_temperature(self, value):
+        """
+        Setter for day_average_temperature
+        """
+        self._day_average_temperature = value
+
+    @property
+    def night_average_temperature(self):
+        """
+        Property night_average_temperature
+        """
+        return self._night_average_temperature
+
+    @night_average_temperature.setter
+    def night_average_temperature(self, value):
+        """
+        Setter for night_average_temperature
+        """
+        self._night_average_temperature = value
+
+    @property
+    def day_feels_like_average_temperature(self):
+        """
+        Property day_feels_like_average_temperature
+        """
+        return self._day_feels_like_average_temperature
+
+    @day_feels_like_average_temperature.setter
+    def day_feels_like_average_temperature(self, value):
+        """
+        Setter for day_feels_like_average_temperature
+        """
+        self._day_feels_like_average_temperature = value
+
+    @property
+    def night_feels_like_average_temperature(self):
+        """
+        Property night_feels_like_average_temperature
+        """
+        return self._night_feels_like_average_temperature
+
+    @night_feels_like_average_temperature.setter
+    def night_feels_like_average_temperature(self, value):
+        """
+        Setter for night_feels_like_average_temperature
+        """
+        self._night_feels_like_average_temperature = value
+
 
 # Main test
 if __name__ == "__main__":
@@ -377,8 +448,6 @@ if __name__ == "__main__":
     logging.basicConfig(**logargs)
 
     # Get key
-    # TODO: put here your key json file with the following content:
-    # { "key": "put your 32 bytes openweather key here" }
     with open("../../../data/conf/openweather.json", "r") as key_file:
         key = json.loads(key_file.read()).get("key")
 
