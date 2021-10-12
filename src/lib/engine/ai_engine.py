@@ -5,9 +5,12 @@ ai_engine.py - File that contains all ai stuff
 """
 
 import logging
+import pathlib
+import os
+from sys import path
 from datetime import datetime
 from os import path, remove
-from lib.actions.weather import WeatherInterface
+from lib.actions.weather import WeatherInterface, WeatherInfoCurrent, WeatherInfoDay, WeatherInfoList
 from lib.recognition.speaker_recognition import SpeakerRecognition
 from config.base import Configuration
 from config.corpus import Corpus
@@ -50,8 +53,18 @@ class AIEngine():
         self._listener = Listener(config.listener.microphone_index,
                                   config.listener.audio_rate, config.listener.adjust_for_noise,
                                   config.listener.sounds_path, config.listener.language)
-
+        # Set listener timeout
         self._listener_timeout = config.listener.timeout
+
+        # Set listener google cloud credentials
+        self._listener_google_cloud_credentials = config.listener.google_cloud_credentials
+
+        # Set google credentials
+        credentials_path = path.join(pathlib.Path(self._listener_google_cloud_credentials).parent.resolve(),
+                      pathlib.Path(self._listener_google_cloud_credentials).name)
+        self._logger.debug(f"Setting google application credentials to {credentials_path}")
+        
+        os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="{}".format(credentials_path)
 
         # Initialize speaker engine
         speaker_language = self._language.split(
@@ -66,7 +79,7 @@ class AIEngine():
         self._temp_path = config.recognition.temp_path
         # Set actions config instance
         self._actions_config = config.actions
-        
+
         # Set to init state
         self._state = Step.LISTENING_NOT_ACTIVE
 
@@ -83,11 +96,18 @@ class AIEngine():
             if self._state == Step.LISTENING_NOT_ACTIVE:
                 self._logger.debug(f"Step: LISTENING_NOT_ACTIVE")
                 try:
+                    found = False
                     # Wait for orders
                     query, audio = self._listener.listen(play_sound=False)
 
                     # If activation_token:
-                    if query and query.lower() in self._corpus_base.activation_tokens:
+                    # Serching for query in defined actions
+                    for token in self._corpus_base.activation_tokens:
+                        if token in query.lower():
+                            found = True
+                            break
+
+                    if found:
                         # Create temp file for audio
                         temp_file = self._get_temp_file(audio)
                         try:
@@ -98,7 +118,6 @@ class AIEngine():
                             # Saying hello to known speaker
                             self._speaker.say(
                                 self._corpus_base.presentation.replace("$speaker$", speaker))
-
                             # Remove file
                             remove(temp_file)
 
@@ -197,12 +216,11 @@ class AIEngine():
         elif action == "time":
             self._logger.debug("time action detected!")
             self._logger.warning("Not implemented yet!")
-            
+
         elif action == "weather":
             self._logger.debug("weather action detected!")
             self._logger.warning("Not implemented yet!")
-            
-            
+
     def _rae_action(self, query):
         """
         Method to launch RAE IA engine
@@ -244,20 +262,31 @@ class AIEngine():
                 else:
                     # No more defintions ...
                     self._speaker.say(
-                            self._corpus_base.ok)
-                    break        
+                        self._corpus_base.ok)
+                    break
         # Word not found or error
         else:
            self._speaker.say(
-                            self._corpus_base.nothing_found) 
+               self._corpus_base.nothing_found)
 
     def _weather_action(self, query):
         """
         Method to retrive weather info
         """
-        weather = WeatherInterface(self._actions_config.openweather_key)
-        
+        city = query.split(' ')[-1]
+        weather = WeatherInterface(city, self._actions_config.openweather_key, self._language)
+        weatherInfo = WeatherInfoList()
+        weatherInfo = weather.search()
 
+        # Iter weather info
+        for weaterItem in weatherInfo:
+            if isinstance(weaterItem, WeatherInfoCurrent):
+                logging.debug("Weather item current")
+                pass
+            elif isinstance(weaterItem, WeatherInfoDay):
+                logging.debug("Weather item day")
+                print(weaterItem)
+                
     def _time_action(self):
         """
         Method to get actual time

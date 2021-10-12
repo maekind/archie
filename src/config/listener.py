@@ -20,6 +20,7 @@ class ListenerConfig():
         self._microphone_index = data["microphone_index"]
         self._timeout = data["timeout"]
         self._sounds_path = data["sounds_path"]
+        self._google_cloud_credentials = data["google_cloud_credentials"]
 
     def __repr__(self):
         """
@@ -69,3 +70,10 @@ class ListenerConfig():
         Return sounds_path
         """
         return self._sounds_path
+
+    @property
+    def google_cloud_credentials(self):
+        """
+        Return google_cloud_credentials
+        """
+        return self._google_cloud_credentials

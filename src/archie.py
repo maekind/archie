@@ -47,8 +47,8 @@ def main():
     args = parser.parse_args()
 
     try:
-        archi = AIEngine(path.dirname(__file__))
-        archi.run()
+        archie = AIEngine(path.dirname(__file__))
+        archie.run()
     except Exception as e:
         logger.error(e)
         sys.exit(1)

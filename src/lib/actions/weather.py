@@ -82,7 +82,7 @@ class WeatherInterface():
         # Set city
         self._city = city
 
-    def search(self, when="today") -> WeatherInfoList:
+    def search(self) -> WeatherInfoList:
         """
         Method to request the weather info
         Returns an instance of WeatherInfoList with items of type WeatherInfoItem
