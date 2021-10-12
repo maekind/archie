@@ -3,7 +3,8 @@ info:
   author: 'Marco ESPINOSA'
   license: 'MIT License'
   file: 'config.yaml'
-  description: 'Configuration file for ARCHI AI ASR'
+  description: 'Configuration file for ARCHIE ASR'
+  email: 'hi@marcoespinosa.es'
 
 listener:
   language: 'es-es'

@@ -14,7 +14,6 @@ from utils.info import run_info_command, run_version_command, __application__
 # Setting application logging level
 LOG_LEVEL = "DEBUG"
 
-
 def configure_logger():
     """
     Method to configure logging
