@@ -7,12 +7,30 @@ archie.py - Application launcher
 import logging
 import argparse
 import sys
+import signal
 from os import path
 from lib.engine.ai_engine import AIEngine
+from services.services import SpawnServices
 from utils.info import run_info_command, run_version_command, __application__
 
 # Setting application logging level
 LOG_LEVEL = "DEBUG"
+
+# Setting signal received
+signal_received = False
+
+# Instance for spawning services
+services = SpawnServices(path.dirname(__file__))
+
+def signal_handler(sig, frame):
+    """
+    Method to catch ctrl+c signal
+    """
+    signal_received = True
+    print('Ctrl+C pressed!')
+    # Stop all spawned services
+    services.stop()
+    sys.exit(0)
 
 def configure_logger():
     """
@@ -46,11 +64,25 @@ def main():
     args = parser.parse_args()
 
     try:
+
+        # Set signal handler to catch SIGINT
+        signal.signal(signal.SIGINT, signal_handler)
+
+        # Spawn services
+        services.run()
+
+        # Launch archie engine
         archie = AIEngine(path.dirname(__file__))
         archie.run()
+
     except Exception as e:
-        logger.error(e)
-        sys.exit(1)
+        if not signal_received:
+            if e is not None:
+                logger.error(e)
+            if services:
+                services.stop()
+                
+            sys.exit(1)
 
     sys.exit(0)
 

@@ -4,6 +4,7 @@
 ai_engine.py - File that contains all ai stuff
 """
 
+import subprocess
 import logging
 import pathlib
 import os
@@ -61,10 +62,12 @@ class AIEngine():
 
         # Set google credentials
         credentials_path = path.join(pathlib.Path(self._listener_google_cloud_credentials).parent.resolve(),
-                      pathlib.Path(self._listener_google_cloud_credentials).name)
-        self._logger.debug(f"Setting google application credentials to {credentials_path}")
-        
-        os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="{}".format(credentials_path)
+                                     pathlib.Path(self._listener_google_cloud_credentials).name)
+        self._logger.debug(
+            f"Setting google application credentials to {credentials_path}")
+
+        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "{}".format(
+            credentials_path)
 
         # Initialize speaker engine
         speaker_language = self._language.split(
@@ -132,7 +135,7 @@ class AIEngine():
                     else:
                         self._logger.warning("Activation token not found!")
                         self._logger.warning(
-                            "Archi speaking: 'For activation say \"Hola Archi\"'")
+                            "Archie speaking: 'For activation say \"Hola Archi\"'")
 
                 except ListenerException as le:
                     self._logger.error(le)
@@ -274,7 +277,8 @@ class AIEngine():
         Method to retrive weather info
         """
         city = query.split(' ')[-1]
-        weather = WeatherInterface(city, self._actions_config.openweather_key, self._language)
+        weather = WeatherInterface(
+            city, self._actions_config.openweather_key, self._language)
         weatherInfo = WeatherInfoList()
         weatherInfo = weather.search()
 
@@ -286,7 +290,7 @@ class AIEngine():
             elif isinstance(weaterItem, WeatherInfoDay):
                 logging.debug("Weather item day")
                 print(weaterItem)
-                
+
     def _time_action(self):
         """
         Method to get actual time

@@ -9,8 +9,8 @@ info:
 listener:
   language: 'es-es'
   audio_rate: 16000
-  adjust_for_noise: False
-  microphone_index: 2
+  adjust_for_noise: True
+  microphone_index: 1
   timeout: 10
   sounds_path: '../data/sounds'
   google_cloud_credentials: '../data/conf/google_cloud.json'
@@ -24,6 +24,16 @@ recognition:
 
 actions:
   openweather_key: '../data/conf/openweather.json'
+
+services: 
+  python_exe: 'python3'
+  path: 'services'
+  services: 
+    - 'weather_rain'
+  weather_rain:
+    host: 'localhost'
+    port: 32150
+
 
 
   
