@@ -10,6 +10,7 @@ from config.info import Info
 from config.listener import ListenerConfig
 from config.recognition import RecognitionConfig
 from config.actions import ActionsConfig
+from config.services import ServicesConfig
 
 
 class Configuration():
@@ -34,6 +35,7 @@ class Configuration():
         self._listenerConfig = ListenerConfig(config["listener"])
         self._recognitionConfig = RecognitionConfig(config["recognition"])
         self._actionsConfig = ActionsConfig(config["actions"])
+        self._services = ServicesConfig(config["services"])
 
     @property
     def info(self):
@@ -62,3 +64,10 @@ class Configuration():
         Return actions instance
         """
         return self._actionsConfig
+
+    @property
+    def services(self):
+        """
+        Return services
+        """
+        return self._services
