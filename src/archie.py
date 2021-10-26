@@ -10,7 +10,7 @@ import sys
 import signal
 from os import path
 from lib.engine.ai_engine import AIEngine
-from services.services import SpawnServices
+from services.service import SpawnServices
 from utils.info import run_info_command, run_version_command, __application__
 
 # Setting application logging level
