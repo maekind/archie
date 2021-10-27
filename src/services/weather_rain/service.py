@@ -5,11 +5,18 @@ File that servers weather service
 """
 import logging
 import uvicorn
+import argparse
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from predict import Predict
 
+# Configure logger instance
+logger = logging.getLogger("Weather service")
+
+# Create FastAPI instance
 weather = FastAPI()
 
+# Allowed origins
 origins = [
     "http://localhost.olympus.com",
     "https://localhost.olympus.com",
@@ -17,6 +24,7 @@ origins = [
     "http://127.0.0.1"
 ]
 
+# Add middleware
 weather.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -26,26 +34,45 @@ weather.add_middleware(
 )
 
 
-# Set logging instance
-LOGGER = logging.getLogger("Weather service")
-
 @weather.get("/predict/{query}")
 async def predict(query: str):
     '''
     Function to predict if it is a rain question
     @returns: json string
     '''
-    LOGGER.info(f'Query received: {query}')
-    return {"query": query}
-    
-    
+    logger.info(f'Query received: {query}')
+    predictor = Predict("models/model_weather_rain.mdl", "models/tokenizer_weather_rain.mdl",
+                        "comment_text", value=[query])
+    # Launch prediction
+    predictions = predictor.run()
+
+    # Printing shape
+    logger.info(f"Shape: {predictions.shape} - Prediction: {predictions[0][0] * 100:.2f}")
+    status = False if predictions[0][0] < .5 else True
+    logger.info(f"Comment <{query}> is {status}")
+
+    return {"prediction": f"{status}", "Accuracy": f"{predictions[0][0] * 100:.2f}"}
+
 
 def main():
     '''
     Function Main
     '''
-    uvicorn.run("service:weather", host="127.0.0.1", port=32152)
-    
+    # Configure arguments
+    parser = argparse.ArgumentParser(description="Weather prediction service")
+    parser.add_argument('--host',
+                        required=True,
+                        help="Host where running the service. IP or FQDN.")
+    parser.add_argument('--port',
+                        help="Port where running the service.",
+                        type=int)
+
+    args = parser.parse_args()
+    logger.debug(f"Arguments: {args.host}:{args.port}")
+
+    # Launch service
+    uvicorn.run("service:weather", host=args.host, port=args.port)
+
+
 if __name__ == "__main__":
     main()
-    

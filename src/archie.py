@@ -10,7 +10,7 @@ import sys
 import signal
 from os import path
 from lib.engine.ai_engine import AIEngine
-from services.service import SpawnServices
+from services.spawn import SpawnServices
 from utils.info import run_info_command, run_version_command, __application__
 
 # Setting application logging level
@@ -70,7 +70,10 @@ def main():
 
         # Spawn services
         services.run()
-
+        # We wait some seconds to have services running
+        import time
+        time.sleep(5)
+        
         # Launch archie engine
         archie = AIEngine(path.dirname(__file__))
         archie.run()

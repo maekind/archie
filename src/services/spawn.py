@@ -48,8 +48,10 @@ class SpawnServices():
         """"
         Method to launch spawn function
         """
-        for service in self._services:
-            self._spawn_service(service)
+        for service, config in self._services.items():
+            print(service)
+            print(config)
+            self._spawn_service(service, config)
 
     def stop(self):
         """
@@ -70,14 +72,16 @@ class SpawnServices():
             
             self._spawned_services.remove((process, service))
 
-    def _spawn_service(self, service):
+    def _spawn_service(self, service, config):
         """
         Method to spawn services
         """
         self._logger.info(f"Spawning service {service} ...")
         # Launching service
         spawned = subprocess.Popen([self._python_exe, path.join(
-            self._services_path, service, self._service_main_file)])
+            self._services_path, service, self._service_main_file),
+            "--host", config.get("host"),
+            "--port", str(config.get("port"))])
         # Save service handler to spawned services list
         self._spawned_services.append((spawned, service))
         self._logger.info("ok")

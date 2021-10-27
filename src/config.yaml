@@ -29,10 +29,9 @@ services:
   python_exe: 'python3'
   path: 'services'
   services: 
-    - 'weather_rain'
-  weather_rain:
-    host: 'localhost'
-    port: 32150
+    weather_rain:
+      host: 'localhost'
+      port: 30152
 
 
 
