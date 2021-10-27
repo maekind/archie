@@ -1,7 +1,7 @@
 # encoding:utf-8
 
 """
-services.py - File that contains Service class to spawn services
+spawn.py - File that contains class to spawn services
 """
 
 import subprocess
