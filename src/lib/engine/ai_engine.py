@@ -4,13 +4,13 @@
 ai_engine.py - File that contains all ai stuff
 """
 
-import subprocess
 import logging
 import pathlib
 import os
 from sys import path
 from datetime import datetime
 from os import path, remove
+from typing import Dict, Tuple
 from lib.actions.weather import WeatherInterface, WeatherInfoCurrent, WeatherInfoDay, WeatherInfoList
 from lib.recognition.speaker_recognition import SpeakerRecognition
 from config.base import Configuration
@@ -21,6 +21,7 @@ from lib.engine.listener_engine import (Listener,
 from lib.engine.speaker_engine import Speaker
 from lib.engine.step import Step
 from lib.actions.rae import RaeInterface
+from services.service_interface import ServiceInterface
 
 
 class AIEngine():
@@ -37,51 +38,23 @@ class AIEngine():
 
         # Load configuration
         self._logger.info("Loading configuration ...")
-        config = Configuration(root_path)
+        self._config = Configuration(root_path)
         self._logger.info("ok")
 
-        # Get corpus path and language to load
-        self._corpus_path = config.recognition.corpus_path
-        self._language = config.listener.language
-
-        # Load corpus language
-        self._logger.info(f"Loading corpus {self._language} ...")
-        self._corpus_base = Corpus(
-            path.join(self._corpus_path, self._language + ".json"))
-        self._logger.info("ok")
+        # Initialize corpus
+        self._initialize_corpus()
 
         # Initialize listener engine
-        self._listener = Listener(config.listener.microphone_index,
-                                  config.listener.audio_rate, config.listener.adjust_for_noise,
-                                  config.listener.sounds_path, config.listener.language)
-        # Set listener timeout
-        self._listener_timeout = config.listener.timeout
+        self._initialize_listener()
 
-        # Set listener google cloud credentials
-        self._listener_google_cloud_credentials = config.listener.google_cloud_credentials
+        # Initialize speaker engine and recognition
+        self._initialize_speaker()
 
-        # Set google credentials
-        credentials_path = path.join(pathlib.Path(self._listener_google_cloud_credentials).parent.resolve(),
-                                     pathlib.Path(self._listener_google_cloud_credentials).name)
-        self._logger.debug(
-            f"Setting google application credentials to {credentials_path}")
+        # Prepare dict for services definition
+        self._services = self._get_services()
 
-        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "{}".format(
-            credentials_path)
-
-        # Initialize speaker engine
-        speaker_language = self._language.split(
-            '-')[0] + "_" + str.upper(self._language.split('-')[1])
-        self._speaker = Speaker(speaker_language)
-
-        # Initialize speaker recognition
-        self._speaker_recognition = SpeakerRecognition(
-            config.recognition.models_path)
-
-        # Set temporary path
-        self._temp_path = config.recognition.temp_path
         # Set actions config instance
-        self._actions_config = config.actions
+        self._actions_config = self._config.actions
 
         # Set to init state
         self._state = Step.LISTENING_NOT_ACTIVE
@@ -135,7 +108,7 @@ class AIEngine():
                     else:
                         self._logger.warning("Activation token not found!")
                         self._logger.warning(
-                            "Archie speaking: 'For activation say \"Hola Archi\"'")
+                            "Archie speaking: 'For activation say \"Hola Archie\"'")
 
                 except ListenerException as le:
                     self._logger.error(le)
@@ -182,9 +155,21 @@ class AIEngine():
                         play = False
 
                 if not found:
-                    self._logger.warning(f"Action {action} not found!")
-                    ai_says = self._corpus_base.unknown_action
-                    self._state = Step.SPEAKING
+                    # TODO: check for other actions:
+
+                    # Check for weather action:
+                    service = ServiceInterface(
+                        self._get_service_info("weather_rain"))
+
+                    if service.query(query):
+                        self._launch_action("weather", query)
+                        # Jump to listenning active state
+                        self._state = Step.LISTENING_ACTIVE
+                        play = False
+                    else:
+                        self._logger.warning(f"Action {action} not found!")
+                        ai_says = self._corpus_base.unknown_action
+                        self._state = Step.SPEAKING
 
             elif self._state == Step.SPEAKING:
                 self._logger.debug(f"Step: SPEAKING")
@@ -197,6 +182,87 @@ class AIEngine():
             elif self._state == Step.TRAINNING:
                 self._logger.debug(f"Step: TRAINNING")
                 pass
+
+    def _initialize_corpus(self):
+        """
+        Method to initialize corpus
+        """
+        # Get corpus path and language to load
+        self._corpus_path = self._config.recognition.corpus_path
+        self._language = self._config.listener.language
+
+        # Load corpus language
+        self._logger.info(f"Loading corpus {self._language} ...")
+        self._corpus_base = Corpus(
+            path.join(self._corpus_path, self._language + ".json"))
+        self._logger.info("ok")
+
+    def _initialize_listener(self):
+        """
+        method to initialize listener
+        """
+        # Initialize listener engine
+        self._listener = Listener(self._config.listener.microphone_index,
+                                  self._config.listener.audio_rate, self._config.listener.adjust_for_noise,
+                                  self._config.listener.sounds_path, self._config.listener.language)
+        # Set listener timeout
+        self._listener_timeout = self._config.listener.timeout
+
+        # Set listener google cloud credentials
+        self._listener_google_cloud_credentials = self._config.listener.google_cloud_credentials
+
+        # Set google credentials
+        credentials_path = path.join(pathlib.Path(self._listener_google_cloud_credentials).parent.resolve(),
+                                     pathlib.Path(self._listener_google_cloud_credentials).name)
+        self._logger.debug(
+            f"Setting google application credentials to {credentials_path}")
+
+        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "{}".format(
+            credentials_path)
+
+    def _initialize_speaker(self):
+        """
+        Method to initialize speaker engine and recognition
+        """
+        # Initialize speaker engine
+        speaker_language = self._language.split(
+            '-')[0] + "_" + str.upper(self._language.split('-')[1])
+        self._speaker = Speaker(speaker_language)
+
+        # Initialize speaker recognition
+        self._speaker_recognition = SpeakerRecognition(
+            self._config.recognition.models_path)
+
+        # Set temporary path
+        self._temp_path = self._config.recognition.temp_path
+
+    def _get_services(self) -> Dict:
+        """
+        Method to build a dictionary with services info.
+        Dictionary key is the name of the service.
+        Values for each key are the host and the port where the service is running.
+        @Return Dict
+        """
+
+        services = dict()
+        # Iterate each service defined in the config file
+        for service, config in self._config.services.services.items():
+            host = config.get("host")
+            port = config.get("port")
+            services.update({service: {"host": host, "port": port}})
+
+        self._logger.debug(f"Get information from services:")
+        self._logger.debug(services)
+
+        return services
+
+    def _get_service_info(self, services, service_name) -> Tuple:
+        """
+        Method to get host and port from a service
+        """
+        service = services.get(service_name)
+
+        return (service.get("host"), service.get("port"))
 
     def _get_temp_file(self, audio):
         """

@@ -13,9 +13,6 @@ from lib.engine.ai_engine import AIEngine
 from services.spawn import SpawnServices
 from utils.info import run_info_command, run_version_command, __application__
 
-# Setting application logging level
-LOG_LEVEL = "DEBUG"
-
 # Setting signal received
 signal_received = False
 
@@ -32,7 +29,7 @@ def signal_handler(sig, frame):
     services.stop()
     sys.exit(0)
 
-def configure_logger():
+def configure_logger(level):
     """
     Method to configure logging
     """
@@ -40,7 +37,7 @@ def configure_logger():
         'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         'datefmt': '%Y-%m-%d %H:%M:%S'}
 
-    logargs["level"] = LOG_LEVEL
+    logargs["level"] = level
 
     logging.basicConfig(**logargs)
 
@@ -51,17 +48,23 @@ def main():
     """
     Main function
     """
-    # Configure logger
-    logger = configure_logger()
-
+    
     # Configure arguments
     parser = argparse.ArgumentParser(description=__application__)
     parser.add_argument('--version', nargs=0,
                         help=argparse.SUPPRESS, action=run_version_command)
     parser.add_argument('-i', '--info', nargs=0,
                         help="show application information", action=run_info_command)
+    parser.add_argument('-l', 
+                        '--logging_level',
+                        default='DEBUG',
+                        help="set logging level to one of the following values: [DEBUG, INFO, WARNING, ERROR, CRITICAL]")
 
     args = parser.parse_args()
+
+    # Configure logger
+    logger = configure_logger(args.logging_level)
+    logger.info(f"Set logging level to {args.logging_level}")
 
     try:
 
