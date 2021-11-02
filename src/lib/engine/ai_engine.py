@@ -189,7 +189,7 @@ class AIEngine():
         """ 
         self._config = Configuration(root_path)
         
-    @trace_info(f"Loading corpus ...")
+    @trace_info("Loading corpus ...")
     def _initialize_corpus(self):
         """
         Method to initialize corpus

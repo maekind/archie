@@ -10,7 +10,7 @@ import functools
 def trace_info(message):
     """ trace logging info decorator """
     def decorator(func):
-        """ decorato for function"""
+        """ decorator for function """
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
             """ wrapper for the decorator """
