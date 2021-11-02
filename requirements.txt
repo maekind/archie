@@ -12,11 +12,17 @@ pyrae
 google-api-python-client
 google-cloud-speech
 oauth2client
-flask
-flask_cors
+# For flask:
+# flask
+# flask_cors
 # For CNN:
 tensorflow
 keras
 pandas
 matplotlib
 dill
+# For Fastapi
+fastapi
+uvicorn[standard]
+requests
+

@@ -5,6 +5,7 @@ speaker_engine.py - File that contains speaker class
 
 import pyttsx3
 import logging
+from utils.decorators import trace_info
 
 __authors__ = "Marco Espinosa"
 __license__ = "MIT License"
@@ -27,13 +28,14 @@ class Speaker():
     Class to handler the speaker
     """
 
+    @trace_info("Initializing speaker engine ...")
     def __init__(self, language, rate=50, gender='VoiceGenderFemale') -> None:
         """
         Default constructor
         """
         # Initialize logger name
-        self._logger = logging.getLogger("Speaker Engine")
-        self._logger.info("Initializing speaker engine ...")
+        self._logger = logging.getLogger(self.__class__.__name__)
+        #self._logger.info("Initializing speaker engine ...")
         # Initialize speaker engine
         self._speaker_engine = pyttsx3.init()
         # Set language
@@ -48,7 +50,7 @@ class Speaker():
         except SpeakerVoiceException as e:
             raise e
 
-        self._logger.info("ok")
+        #self._logger.info("ok")
 
     def _configure_voice(self):
         """

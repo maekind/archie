@@ -3,10 +3,12 @@
 listener_engine.py - File that contains listener class
 """
 
+from inspect import trace
 from os import path
 import speech_recognition as sr
 import logging
 from playsound import playsound
+from utils.decorators import trace_info
 
 
 class ListenerRecognizerException(Exception):
@@ -26,13 +28,14 @@ class Listener():
     Class to handler the listener
     """
 
+    @trace_info("Initializing listener engine ...")
     def __init__(self, microphone_index, audio_rate, adjust_for_noise, sounds_path, language="es-es") -> None:
         """
         Default constructor
         """
         # Initialize logger name
-        self._logger = logging.getLogger("Listener Engine")
-        self._logger.info("Initializing listener engine ...")
+        self._logger = logging.getLogger(self.__class__.__name__)
+        #self._logger.info("Initializing listener engine ...")
         # Set language
         self._language = language
         # Initialize listener
@@ -50,7 +53,7 @@ class Listener():
         # Set sounds path
         self._sounds_path = sounds_path
 
-        self._logger.info("ok")
+        #self._logger.info("ok")
 
     def listen(self, timeout=None, play_sound=True):
         """

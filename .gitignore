@@ -12,6 +12,7 @@ data/conf/readme
 .DS_Store
 standalone.sh
 SBW-vectors-300-min5.*
+*.pdf
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

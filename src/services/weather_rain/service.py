@@ -6,12 +6,14 @@ File that servers weather service
 import logging
 import uvicorn
 import argparse
+from os import path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from predict import Predict
+from urllib import parse
 
 # Configure logger instance
-logger = logging.getLogger("Weather service")
+logger = logging.getLogger("WeatherService")
 
 # Create FastAPI instance
 weather = FastAPI()
@@ -41,13 +43,15 @@ async def predict(query: str):
     @returns: json string
     '''
     logger.info(f'Query received: {query}')
-    predictor = Predict("models/model_weather_rain.mdl", "models/tokenizer_weather_rain.mdl",
-                        "comment_text", value=[query])
+    predictor = Predict(path.join(path.dirname(__file__), "models", "model_weather_rain.mdl"), 
+                        path.join(path.dirname(__file__), "models", "tokenizer_weather_rain.mdl"),
+                        "comment_text", value=[parse.unquote_plus(query)])
     # Launch prediction
     predictions = predictor.run()
 
     # Printing shape
-    logger.info(f"Shape: {predictions.shape} - Prediction: {predictions[0][0] * 100:.2f}")
+    logger.info(
+        f"Shape: {predictions.shape} - Prediction: {predictions[0][0] * 100:.2f}")
     status = False if predictions[0][0] < .5 else True
     logger.info(f"Comment <{query}> is {status}")
 

@@ -5,7 +5,7 @@ model.py - File that contains web service class model
 """
 
 import requests
-from typing import Tuple
+from typing import Text, Tuple
 from urllib import parse
 
 
@@ -47,7 +47,10 @@ class ServiceInterface:
         parameter = parse.quote_plus(query)
         res = requests.get(self._url + f"/predict/{parameter}")
 
-        print(res)
-            
-        return False
-        
+        prediction = dict()
+        prediction = res.json()
+        print(f"Prediction: {prediction}")
+        if prediction.get("prediction") == "True":
+            return True
+        else:
+            return False        

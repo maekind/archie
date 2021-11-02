@@ -22,6 +22,7 @@ from lib.engine.speaker_engine import Speaker
 from lib.engine.step import Step
 from lib.actions.rae import RaeInterface
 from services.service_interface import ServiceInterface
+from utils.decorators import trace_info
 
 
 class AIEngine():
@@ -34,12 +35,10 @@ class AIEngine():
         Default constructor
         """
         # Set logger name
-        self._logger = logging.getLogger("AI Engine")
+        self._logger = logging.getLogger(self.__class__.__name__)
 
         # Load configuration
-        self._logger.info("Loading configuration ...")
-        self._config = Configuration(root_path)
-        self._logger.info("ok")
+        self._get_configuration(root_path)
 
         # Initialize corpus
         self._initialize_corpus()
@@ -59,6 +58,7 @@ class AIEngine():
         # Set to init state
         self._state = Step.LISTENING_NOT_ACTIVE
 
+    @trace_info("Running AI Engine ...")
     def run(self):
         """
         Function that launches engine
@@ -70,7 +70,7 @@ class AIEngine():
         while(True):
 
             if self._state == Step.LISTENING_NOT_ACTIVE:
-                self._logger.debug(f"Step: LISTENING_NOT_ACTIVE")
+                self._logger.debug("Step: LISTENING_NOT_ACTIVE")
                 try:
                     found = False
                     # Wait for orders
@@ -117,7 +117,7 @@ class AIEngine():
                     self._logger.error(lre)
 
             elif self._state == Step.LISTENING_ACTIVE:
-                self._logger.debug(f"Step: LISTENING_ACTIVE")
+                self._logger.debug("Step: LISTENING_ACTIVE")
                 try:
                     # Wait for orders
                     query, audio = self._listener.listen(
@@ -136,12 +136,12 @@ class AIEngine():
                 except ListenerRecognizerException as lre:
                     self._logger.error(lre)
 
-                pass
+                
             elif self._state == Step.RECOGNITION:
-                self._logger.debug(f"Step: RECOGNITION")
+                self._logger.debug("Step: RECOGNITION")
                 pass
             elif self._state == Step.PROCESSING:
-                self._logger.debug(f"Step: PROCESSING")
+                self._logger.debug("Step: PROCESSING")
                 found = False
                 self._logger.info(f"Searching for action in {query}")
                 # Serching for query in defined actions
@@ -158,7 +158,7 @@ class AIEngine():
                     # TODO: check for other actions:
 
                     # Check for weather action:
-                    service = ServiceInterface(
+                    service = ServiceInterface("weather_rain",
                         self._get_service_info("weather_rain"))
 
                     if service.query(query):
@@ -172,17 +172,24 @@ class AIEngine():
                         self._state = Step.SPEAKING
 
             elif self._state == Step.SPEAKING:
-                self._logger.debug(f"Step: SPEAKING")
-                self._logger.info(f"AI speaking...")
+                self._logger.debug("Step: SPEAKING")
+                self._logger.info("AI speaking...")
                 # ai says something
                 self._speaker.say(ai_says)
                 # Jump to listenning active state
                 self._state = Step.LISTENING_ACTIVE
 
             elif self._state == Step.TRAINNING:
-                self._logger.debug(f"Step: TRAINNING")
-                pass
+                self._logger.debug("Step: TRAINNING")
 
+    @trace_info("Loading configuration ...")
+    def _get_configuration(self, root_path):
+        """
+        Method to load configuration
+        """ 
+        self._config = Configuration(root_path)
+        
+    @trace_info(f"Loading corpus ...")
     def _initialize_corpus(self):
         """
         Method to initialize corpus
@@ -192,10 +199,9 @@ class AIEngine():
         self._language = self._config.listener.language
 
         # Load corpus language
-        self._logger.info(f"Loading corpus {self._language} ...")
+        self._logger.info(f"Corpus: {self._language}")
         self._corpus_base = Corpus(
             path.join(self._corpus_path, self._language + ".json"))
-        self._logger.info("ok")
 
     def _initialize_listener(self):
         """
@@ -236,6 +242,7 @@ class AIEngine():
         # Set temporary path
         self._temp_path = self._config.recognition.temp_path
 
+    @trace_info("Getting information from services ...")
     def _get_services(self) -> Dict:
         """
         Method to build a dictionary with services info.
@@ -251,16 +258,15 @@ class AIEngine():
             port = config.get("port")
             services.update({service: {"host": host, "port": port}})
 
-        self._logger.debug(f"Get information from services:")
         self._logger.debug(services)
 
         return services
 
-    def _get_service_info(self, services, service_name) -> Tuple:
+    def _get_service_info(self, service_name) -> Tuple:
         """
         Method to get host and port from a service
         """
-        service = services.get(service_name)
+        service = self._services.get(service_name)
 
         return (service.get("host"), service.get("port"))
 
@@ -290,6 +296,7 @@ class AIEngine():
             self._logger.debug("weather action detected!")
             self._logger.warning("Not implemented yet!")
 
+    @trace_info("Launching RAE action ...")
     def _rae_action(self, query):
         """
         Method to launch RAE IA engine
@@ -338,6 +345,7 @@ class AIEngine():
            self._speaker.say(
                self._corpus_base.nothing_found)
 
+    @trace_info("Launching Weather action ...")
     def _weather_action(self, query):
         """
         Method to retrive weather info
@@ -352,7 +360,7 @@ class AIEngine():
         for weaterItem in weatherInfo:
             if isinstance(weaterItem, WeatherInfoCurrent):
                 logging.debug("Weather item current")
-                pass
+                
             elif isinstance(weaterItem, WeatherInfoDay):
                 logging.debug("Weather item day")
                 print(weaterItem)

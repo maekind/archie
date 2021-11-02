@@ -10,6 +10,7 @@ import _pickle as cPickle
 import numpy as np
 from scipy.io.wavfile import read
 from lib.recognition.speaker_features import SpeakerFeatures
+from utils.decorators import trace_info
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -31,19 +32,18 @@ class SpeakerRecognition():
     # List to store trained models. Tuple of (model, speaker name)
     _models = []
 
+    @trace_info("Initializing speaker recognition ...")
     def __init__(self, model_path) -> None:
         """
         Default constructor
         """
         # Initialize logger name
-        self._logger = logging.getLogger("Speaker Recognition")
+        self._logger = logging.getLogger(self.__class__.__name__)
         # Set model path variable
         self._model_path = model_path
         # Load models in initialization
-        self._logger.info("Loading models ...")
         self._load_models()
-        self._logger.info("ok")
-
+        
     def find_speaker(self, audio_file):
         """
         Method to find best speaker recognition from trainned files
@@ -66,6 +66,7 @@ class SpeakerRecognition():
 
         return speaker
 
+    @trace_info("Loading models ...")
     def _load_models(self, force=False):
         """
         Method to load trained models
