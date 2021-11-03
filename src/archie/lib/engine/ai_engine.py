@@ -11,18 +11,18 @@ from sys import path
 from datetime import datetime
 from os import path, remove
 from typing import Dict, Tuple
-from lib.actions.weather import WeatherInterface, WeatherInfoCurrent, WeatherInfoDay, WeatherInfoList
-from lib.recognition.speaker_recognition import SpeakerRecognition
-from config.base import Configuration
-from config.corpus import Corpus
-from lib.engine.listener_engine import (Listener,
+from archie.lib.actions.weather import WeatherInterface, WeatherInfoCurrent, WeatherInfoDay, WeatherInfoList
+from archie.lib.recognition.speaker_recognition import SpeakerRecognition
+from archie.config.base import Configuration
+from archie.config.corpus import Corpus
+from archie.lib.engine.listener_engine import (Listener,
                                         ListenerException, ListenerRecognizerException,
                                         ListenerTimeoutException)
-from lib.engine.speaker_engine import Speaker
-from lib.engine.step import Step
-from lib.actions.rae import RaeInterface
-from services.service_interface import ServiceInterface
-from utils.decorators import trace_info
+from archie.lib.engine.speaker_engine import Speaker
+from archie.lib.engine.step import Step
+from archie.lib.actions.rae import RaeInterface
+from archie.services.service_interface import ServiceInterface
+from archie.utils.decorators import trace_info
 
 
 class AIEngine():

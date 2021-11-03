@@ -3,12 +3,11 @@
 listener_engine.py - File that contains listener class
 """
 
-from inspect import trace
-from os import path
-import speech_recognition as sr
 import logging
+import speech_recognition as sr
+from os import path
 from playsound import playsound
-from utils.decorators import trace_info
+from archie.utils.decorators import trace_info
 
 
 class ListenerRecognizerException(Exception):

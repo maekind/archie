@@ -3,8 +3,8 @@
 show_microphones.py - File that contains code to find installed microphones
 """
 
-import speech_recognition as sr
 import logging
+import speech_recognition as sr
 
 __authors__ = "Marco Espinosa"
 __license__ = "MIT License"

@@ -3,14 +3,14 @@
 train_models.py - File that contains training models class for voice recognition
 """
 
-import _pickle as cPickle
+import logging
 import numpy as np
 import warnings
-import logging
+import _pickle as cPickle
 from os import path, walk
 from scipy.io.wavfile import read
 from sklearn.mixture import GaussianMixture as GMM
-from lib.recognition.speaker_features import SpeakerFeatures
+from archie.lib.recognition.speaker_features import SpeakerFeatures
 
 warnings.filterwarnings("ignore")
 

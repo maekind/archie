@@ -9,8 +9,8 @@ import logging
 import signal
 from os import path
 from collections import deque
-from utils.decorators import trace_info
-from config.base import Configuration
+from archie.utils.decorators import trace_info
+from archie.config.base import Configuration
 
 
 class SpawnServices():

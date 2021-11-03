@@ -4,14 +4,14 @@ speaker_recognition.py - File that contains class with speaker recognition metho
 """
 
 import logging
-import time
 import os
 import _pickle as cPickle
 import numpy as np
-from scipy.io.wavfile import read
-from lib.recognition.speaker_features import SpeakerFeatures
-from utils.decorators import trace_info
 import warnings
+from scipy.io.wavfile import read
+from archie.lib.recognition.speaker_features import SpeakerFeatures
+from archie.utils.decorators import trace_info
+
 warnings.filterwarnings("ignore")
 
 __authors__ = "Marco Espinosa"

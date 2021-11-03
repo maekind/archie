@@ -5,10 +5,10 @@ speaker_features.py - This file contains class with methods to extract speech fe
 from an audio
 """
 
-import numpy as np
-from sklearn import preprocessing
-import python_speech_features as mfcc
 import logging
+import numpy as np
+import python_speech_features as mfcc
+from sklearn import preprocessing
 
 __authors__ = "Marco Espinosa"
 __license__ = "MIT License"

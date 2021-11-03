@@ -9,9 +9,9 @@ import argparse
 import sys
 import signal
 from os import path
-from lib.engine.ai_engine import AIEngine
-from services.spawn import SpawnServices
-from utils.info import run_info_command, run_version_command, __application__
+from archie.lib.engine.ai_engine import AIEngine
+from archie.services.spawn import SpawnServices
+from archie.utils.info import run_info_command, run_version_command, __application__
 
 # Setting signal received
 signal_received = False

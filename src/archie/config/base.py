@@ -6,11 +6,11 @@ base.py - Base file for handle configuration
 
 import yaml
 from os import path
-from config.info import Info
-from config.listener import ListenerConfig
-from config.recognition import RecognitionConfig
-from config.actions import ActionsConfig
-from config.services import ServicesConfig
+from archie.config.info import Info
+from archie.config.listener import ListenerConfig
+from archie.config.recognition import RecognitionConfig
+from archie.config.actions import ActionsConfig
+from archie.config.services import ServicesConfig
 
 
 class Configuration():

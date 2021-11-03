@@ -5,7 +5,7 @@ speaker_engine.py - File that contains speaker class
 
 import pyttsx3
 import logging
-from utils.decorators import trace_info
+from archie.utils.decorators import trace_info
 
 __authors__ = "Marco Espinosa"
 __license__ = "MIT License"

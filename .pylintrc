@@ -196,7 +196,7 @@ never-returning-functions=sys.exit
 additional-builtins=
 
 # Tells whether unused global variables should be treated as a violation.
-allow-global-unused-variables=yes
+allow-global-unused-variables=no
 
 # List of names allowed to shadow builtins
 allowed-redefined-builtins=
@@ -246,7 +246,7 @@ spelling-store-unknown-words=no
 
 # The type of string formatting that logging methods do. `old` means using %
 # formatting, `new` is for `{}` formatting.
-logging-format-style=old
+logging-format-style=new
 
 # Logging modules to check that the string format arguments are in logging
 # function parameter format.
@@ -300,7 +300,7 @@ class-attribute-naming-style=any
 #class-attribute-rgx=
 
 # Naming style matching correct class constant names.
-class-const-naming-style=UPPER_CASE
+class-const-naming-style=
 
 # Regular expression matching correct class constant names. Overrides class-
 # const-naming-style.
@@ -314,7 +314,7 @@ class-naming-style=PascalCase
 #class-rgx=
 
 # Naming style matching correct constant names.
-const-naming-style=UPPER_CASE
+const-naming-style=
 
 # Regular expression matching correct constant names. Overrides const-naming-
 # style.
@@ -322,7 +322,7 @@ const-naming-style=UPPER_CASE
 
 # Minimum line length for functions/classes that require docstrings, shorter
 # ones are exempt.
-docstring-min-length=-1
+docstring-min-length=1
 
 # Naming style matching correct function names.
 function-naming-style=snake_case
@@ -337,6 +337,7 @@ good-names=i,
            k,
            ex,
            Run,
+           fi,
            _
 
 # Good variable names regexes, separated by a comma. If names match any regex,
@@ -344,7 +345,7 @@ good-names=i,
 good-names-rgxs=
 
 # Include a hint for the correct naming format with invalid-name.
-include-naming-hint=no
+include-naming-hint=yes
 
 # Naming style matching correct inline iteration names.
 inlinevar-naming-style=any
@@ -604,5 +605,4 @@ preferred-modules=
 
 # Exceptions that will emit a warning when being caught. Defaults to
 # "BaseException, Exception".
-overgeneral-exceptions=BaseException,
-                       Exception
+overgeneral-exceptions=BaseException
