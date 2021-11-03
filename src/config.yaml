@@ -12,22 +12,22 @@ listener:
   adjust_for_noise: True
   microphone_index: 1
   timeout: 10
-  sounds_path: '../../data/sounds'
-  google_cloud_credentials: '../../data/conf/google_cloud.json'
+  sounds_path: '../data/sounds'
+  google_cloud_credentials: '../data/conf/google_cloud.json'
 
 recognition:
-  models_path: '../../data/models'
-  samples_path: '../../data/samples'
+  models_path: '../data/models'
+  samples_path: '../data/samples'
   min_train_samples: 5
-  corpus_path: '../../data/corpus'
-  temp_path: '../../data/temp'
+  corpus_path: '../data/corpus'
+  temp_path: '../data/temp'
 
 actions:
-  openweather_key: '../../data/conf/openweather.json'
+  openweather_key: '../data/conf/openweather.json'
 
 services: 
   python_exe: 'python3'
-  path: 'services'
+  path: 'archie/services'
   services: 
     weather_rain:
       host: 'localhost'
