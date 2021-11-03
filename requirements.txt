@@ -12,9 +12,6 @@ pyrae
 google-api-python-client
 google-cloud-speech
 oauth2client
-# For flask:
-# flask
-# flask_cors
 # For CNN:
 tensorflow
 keras
@@ -23,6 +20,6 @@ matplotlib
 dill
 # For Fastapi
 fastapi
-uvicorn[standard]
+uvicorn
 requests
 
