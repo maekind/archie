@@ -18,16 +18,16 @@ class SpawnServices():
     Class to spawn services
     """
 
-    def __init__(self, root_path) -> None:
+    def __init__(self, config:Configuration) -> None:
         """
         Default constructor
         """
         # Set logger name
         self._logger = logging.getLogger("SpawnServices")
 
-        # Load configuration
-        self._get_configuration(root_path)
-
+        # Set config instance
+        self._config = config
+        
         # Load python executable
         self._python_exe = self._config.services.python_exe
 
@@ -68,13 +68,6 @@ class SpawnServices():
                 process.kill()
 
             self._spawned_services.remove((process, service))
-
-    @trace_info("Loading configuration ...")
-    def _get_configuration(self, root_path):
-        """
-        Method to load configuration
-        """
-        self._config = Configuration(root_path)
 
     def _spawn_service(self, service, config):
         """

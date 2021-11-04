@@ -12,12 +12,19 @@ from os import path
 from archie.lib.engine.ai_engine import AIEngine
 from archie.services.spawn import SpawnServices
 from archie.utils.info import run_info_command, run_version_command, __application__
+from archie.config.base import Configuration
+from archie.utils.decorators import trace_info
+
+# Paths
+data_path = r"/Users/marco/Documents/Proyectos/P017-Assistant/archie"
+conf_path = r"/Users/marco/Documents/Proyectos/P017-Assistant/archie/src"
+services_path = r"/Users/marco/Documents/Proyectos/P017-Assistant/archie/src"
 
 # Setting signal received
 signal_received = False
 
-# Instance for spawning services
-services = SpawnServices(path.dirname(__file__))
+# Instance initialization for spawning services
+services = None
 
 def signal_handler(sig, frame):
     """
@@ -26,7 +33,8 @@ def signal_handler(sig, frame):
     signal_received = True
     print('Ctrl+C pressed!')
     # Stop all spawned services
-    services.stop()
+    if services:
+        services.stop()
     sys.exit(0)
 
 def configure_logger(level):
@@ -42,6 +50,13 @@ def configure_logger(level):
     logging.basicConfig(**logargs)
 
     return logging.getLogger("Archie")
+
+@trace_info("Loading configuration file ...")
+def get_configuration():
+    """
+    Function to get configuration instance
+    """
+    return Configuration(conf_path, data_path, services_path)
 
 
 def main():
@@ -67,18 +82,25 @@ def main():
     logger.info(f"Set logging level to {args.logging_level}")
 
     try:
-
+        
         # Set signal handler to catch SIGINT
         signal.signal(signal.SIGINT, signal_handler)
 
+        # Get configuration instance
+        config = get_configuration()
+
+        # Initialize services
+        services = SpawnServices(config)
+
         # Spawn services
         services.run()
+
         # We wait some seconds to have services running
         import time
         time.sleep(5)
         
         # Launch archie engine
-        archie = AIEngine(path.dirname(__file__))
+        archie = AIEngine(config)
         archie.run()
 
     except Exception as e:

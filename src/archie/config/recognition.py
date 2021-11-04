@@ -4,21 +4,22 @@
 recognition.py - Handler for recognition configuration data in configuration file
 """
 
+from os import path
 
 class RecognitionConfig():
     """
     Class to hadle Recognition configuration from config file
     """
 
-    def __init__(self, data):
+    def __init__(self, data, data_path):
         """
         Default constructor
         """
-        self._models_path = data["models_path"]
-        self._samples_path = data["samples_path"]
+        self._models_path = path.join(data_path, data["models_path"])
+        self._samples_path = path.join(data_path, data["samples_path"])
         self._min_train_samples = data["min_train_samples"]
-        self._corpus_path = data["corpus_path"]
-        self._temp_path = data["temp_path"]
+        self._corpus_path = path.join(data_path, data["corpus_path"])
+        self._temp_path = path.join(data_path, data["temp_path"])
 
     def __repr__(self):
         """

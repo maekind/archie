@@ -4,18 +4,19 @@
 services.py - Handler for services configuration data in configuration file
 """
 
+from os import path
 
 class ServicesConfig():
     """
     Class to hadle Services configuration from config file
     """
 
-    def __init__(self, data):
+    def __init__(self, data, services_path):
         """
         Default constructor
         """
         self._python_exe = data["python_exe"]
-        self._path = data["path"]
+        self._path = path.join(services_path, data["path"])
         self._services = data["services"]
 
     def __repr__(self):

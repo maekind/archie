@@ -4,13 +4,14 @@
 listener.py - Handler for listener configuration data in configuration file
 """
 
+from os import path
 
 class ListenerConfig():
     """
     Class to hadle Listener configuration from config file
     """
 
-    def __init__(self, data):
+    def __init__(self, data, data_path):
         """
         Default constructor
         """
@@ -19,8 +20,8 @@ class ListenerConfig():
         self._adjust_for_noise = data["adjust_for_noise"]
         self._microphone_index = data["microphone_index"]
         self._timeout = data["timeout"]
-        self._sounds_path = data["sounds_path"]
-        self._google_cloud_credentials = data["google_cloud_credentials"]
+        self._sounds_path = path.join(data_path, data["sounds_path"])
+        self._google_cloud_credentials = path.join(data_path, data["google_cloud_credentials"])
 
     def __repr__(self):
         """

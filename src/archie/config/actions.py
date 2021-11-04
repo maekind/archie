@@ -3,18 +3,20 @@
 """
 actions.py - Handler for actions configuration data in configuration file
 """
+import logging
 import json
+from os import path
 
 class ActionsConfig():
     """
     Class to hadle Actions configuration from config file
     """
 
-    def __init__(self, data):
+    def __init__(self, data, data_path):
         """
         Default constructor
         """
-        with open(data["openweather_key"], "r") as key_file:
+        with open(path.join(data_path, data["openweather_key"]), "r") as key_file:
             self._openweater_key = json.loads(key_file.read()).get("key")
 
     def __repr__(self):

@@ -16,8 +16,8 @@ from archie.lib.recognition.speaker_recognition import SpeakerRecognition
 from archie.config.base import Configuration
 from archie.config.corpus import Corpus
 from archie.lib.engine.listener_engine import (Listener,
-                                        ListenerException, ListenerRecognizerException,
-                                        ListenerTimeoutException)
+                                               ListenerException, ListenerRecognizerException,
+                                               ListenerTimeoutException)
 from archie.lib.engine.speaker_engine import Speaker
 from archie.lib.engine.step import Step
 from archie.lib.actions.rae import RaeInterface
@@ -30,7 +30,7 @@ class AIEngine():
     Class that contains AI engine methods
     """
 
-    def __init__(self, root_path) -> None:
+    def __init__(self, config: Configuration) -> None:
         """
         Default constructor
         """
@@ -38,7 +38,7 @@ class AIEngine():
         self._logger = logging.getLogger(self.__class__.__name__)
 
         # Load configuration
-        self._get_configuration(root_path)
+        self._config = config
 
         # Initialize corpus
         self._initialize_corpus()
@@ -136,7 +136,6 @@ class AIEngine():
                 except ListenerRecognizerException as lre:
                     self._logger.error(lre)
 
-                
             elif self._state == Step.RECOGNITION:
                 self._logger.debug("Step: RECOGNITION")
                 pass
@@ -159,7 +158,7 @@ class AIEngine():
 
                     # Check for weather action:
                     service = ServiceInterface("weather_rain",
-                        self._get_service_info("weather_rain"))
+                                               self._get_service_info("weather_rain"))
 
                     if service.query(query):
                         self._launch_action("weather", query)
@@ -182,13 +181,6 @@ class AIEngine():
             elif self._state == Step.TRAINNING:
                 self._logger.debug("Step: TRAINNING")
 
-    @trace_info("Loading configuration ...")
-    def _get_configuration(self, root_path):
-        """
-        Method to load configuration
-        """ 
-        self._config = Configuration(root_path)
-        
     @trace_info("Loading corpus ...")
     def _initialize_corpus(self):
         """
@@ -257,8 +249,6 @@ class AIEngine():
             host = config.get("host")
             port = config.get("port")
             services.update({service: {"host": host, "port": port}})
-
-        self._logger.debug(services)
 
         return services
 
@@ -360,7 +350,7 @@ class AIEngine():
         for weaterItem in weatherInfo:
             if isinstance(weaterItem, WeatherInfoCurrent):
                 logging.debug("Weather item current")
-                
+
             elif isinstance(weaterItem, WeatherInfoDay):
                 logging.debug("Weather item day")
                 print(weaterItem)

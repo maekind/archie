@@ -18,24 +18,25 @@ class Configuration():
     Function to handle configuration from file
     """
 
-    def __init__(self, base_path):
+    def __init__(self, conf_path, data_path, services_path):
         """
         Default constructor
-        @base_path: absolute script path
+        @data_path: absolute data path
+        @conf_path: absolute conf path
         """
 
-        self.__loads(path.join(base_path, 'config.yaml'))
+        self.__loads(path.join(conf_path, 'config.yaml'), data_path, services_path)
 
-    def __loads(self, config_file):
+    def __loads(self, config_file, data_path, services_path):
         """
         Loads configuration data into config instansces
         """
         config = yaml.load(open(config_file, 'r'), Loader=yaml.FullLoader)
         self._info = Info(config["info"])
-        self._listenerConfig = ListenerConfig(config["listener"])
-        self._recognitionConfig = RecognitionConfig(config["recognition"])
-        self._actionsConfig = ActionsConfig(config["actions"])
-        self._services = ServicesConfig(config["services"])
+        self._listenerConfig = ListenerConfig(config["listener"], data_path)
+        self._recognitionConfig = RecognitionConfig(config["recognition"], data_path)
+        self._actionsConfig = ActionsConfig(config["actions"], data_path)
+        self._services = ServicesConfig(config["services"], services_path)
 
     @property
     def info(self):
