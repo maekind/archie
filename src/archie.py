@@ -15,49 +15,109 @@ from archie.utils.info import run_info_command, run_version_command, __applicati
 from archie.config.base import Configuration
 from archie.utils.decorators import trace_info
 
-# Paths
-data_path = r"/Users/marco/Documents/Proyectos/P017-Assistant/archie"
-conf_path = r"/Users/marco/Documents/Proyectos/P017-Assistant/archie/src"
-services_path = r"/Users/marco/Documents/Proyectos/P017-Assistant/archie/src"
+class ArchieASR():
+    """
+    Archie ASR launcher class
+    """
+  
+    # Paths
+    _data_path = r"/Users/marco/Documents/Proyectos/P017-Assistant/archie"
+    _conf_path = r"/Users/marco/Documents/Proyectos/P017-Assistant/archie/src"
+    _services_path = r"/Users/marco/Documents/Proyectos/P017-Assistant/archie/src"
 
-# Setting signal received
-signal_received = False
+    # Setting signal received
+    _signal_received = False
 
-# Instance initialization for spawning services
-services = None
+    # Instance initialization for spawning services
+    _services:SpawnServices = None
+
+    # Initialize configuration instance
+    _config:Configuration = None
+
+    def __init__(self, logging_level, signal_func) -> None:
+        """
+        Default constructor
+        """
+        # Configuring logger
+        self._configure_logger(logging_level)
+
+        # Creating logger instance
+        self._logger = logging.getLogger("Archie")
+
+        # Set signal handler to catch SIGINT
+        signal.signal(signal.SIGINT, signal_func)
+
+        # Getting configuration
+        self._get_configuration()
+
+        # Launch services
+        self._launch_services()
+
+
+    def _configure_logger(self, level):
+        """
+        Method to configure logging
+        """
+        logargs = {
+            'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+            'datefmt': '%Y-%m-%d %H:%M:%S'}
+
+        logargs["level"] = level
+
+        logging.basicConfig(**logargs)
+
+        
+
+    @trace_info("Loading configuration file ...")
+    def _get_configuration(self):
+        """
+        Function to get configuration instance
+        """
+        self._config = Configuration(self._conf_path, self._data_path, self._services_path)
+
+    @trace_info("Spawining services ...")
+    def _launch_services(self):
+        """
+        Method to launch services
+        """
+        # Initialize services
+        self._services = SpawnServices(self._config)
+
+        # Spawn services
+        self._services.run()
+
+        # We wait some seconds to have services running
+        import time
+        time.sleep(5)
+
+    def run(self):
+        """
+        Method to launch Archie Engine
+        """
+        # Launch archie engine forever
+        archie = AIEngine(self._config)
+        archie.run()
+
+    @trace_info("Stopping services ...")
+    def stop_services(self):
+        """
+        Method to stop all running services
+        """
+        if self._services:
+            self._services.stop()
+
+# Initialize archie to use under signal detection
+archie:ArchieASR = None
 
 def signal_handler(sig, frame):
-    """
-    Method to catch ctrl+c signal
-    """
-    signal_received = True
-    print('Ctrl+C pressed!')
-    # Stop all spawned services
-    if services:
-        services.stop()
-    sys.exit(0)
-
-def configure_logger(level):
-    """
-    Method to configure logging
-    """
-    logargs = {
-        'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-        'datefmt': '%Y-%m-%d %H:%M:%S'}
-
-    logargs["level"] = level
-
-    logging.basicConfig(**logargs)
-
-    return logging.getLogger("Archie")
-
-@trace_info("Loading configuration file ...")
-def get_configuration():
-    """
-    Function to get configuration instance
-    """
-    return Configuration(conf_path, data_path, services_path)
-
+        """
+        Method to catch ctrl+c signal
+        """
+        print('Ctrl+C pressed!')
+        # Stop all spawned services
+        if archie:
+            archie.stop_services()
+        sys.exit(1)
 
 def main():
     """
@@ -77,39 +137,24 @@ def main():
 
     args = parser.parse_args()
 
-    # Configure logger
-    logger = configure_logger(args.logging_level)
-    logger.info(f"Set logging level to {args.logging_level}")
-
     try:
         
         # Set signal handler to catch SIGINT
-        signal.signal(signal.SIGINT, signal_handler)
+        #signal.signal(signal.SIGINT, signal_handler)
 
-        # Get configuration instance
-        config = get_configuration()
+        # Archie instance initialization
+        archie = ArchieASR(args.logging_level, signal_handler)
 
-        # Initialize services
-        services = SpawnServices(config)
-
-        # Spawn services
-        services.run()
-
-        # We wait some seconds to have services running
-        import time
-        time.sleep(5)
-        
-        # Launch archie engine
-        archie = AIEngine(config)
+        # Launching Archie
         archie.run()
-
+        
     except Exception as e:
-        if not signal_received:
-            if e is not None:
-                logger.error(e)
-            if services:
-                services.stop()
-                
+        if e is not None:
+            logger = logging.getLogger()
+            logger.error(e)
+            if archie:
+                archie.stop_services()
+
             sys.exit(1)
 
     sys.exit(0)
