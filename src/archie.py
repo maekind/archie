@@ -106,8 +106,14 @@ class ArchieLauncher():
         Method to launch Archie Engine
         """
         # Launch archie engine forever
-        archie = AIEngine(self._config)
-        archie.run()
+        self._archie = AIEngine(self._config)
+        self._archie.run()
+
+    def stop_services(self):
+        """
+        Public interface to stop services
+        """
+        self._stop_services()
 
     @trace_info("Stopping services ...")
     def _stop_services(self):
@@ -124,6 +130,8 @@ class ArchieLauncher():
         self._logger.warning('Ctrl+C pressed!')
         # Stop all spawned services
         self._stop_services()
+        # Stop engine
+        self._archie.stop_engine()
 
         raise ArchieSIGINTCatchedException()
 

@@ -22,6 +22,10 @@ recognition:
   corpus_path: 'data/corpus'
   temp_path: 'data/temp'
 
+speaker:
+  # engine values could be gTTS or pyttsx3
+  engine: 'gTTS'
+
 actions:
   openweather_key: 'data/conf/openweather.json'
 

@@ -11,6 +11,7 @@ from archie.config.listener import ListenerConfig
 from archie.config.recognition import RecognitionConfig
 from archie.config.actions import ActionsConfig
 from archie.config.services import ServicesConfig
+from archie.config.speaker import SpeakerConfig
 
 
 class Configuration():
@@ -53,6 +54,7 @@ class Configuration():
         self._actionsConfig = ActionsConfig(config["actions"], self._data_path)
         self._services = ServicesConfig(
             config["services"], self._services_path)
+        self._speakerConfig = SpeakerConfig(config["speaker"])
 
     @property
     def info(self):
@@ -88,3 +90,10 @@ class Configuration():
         Return services
         """
         return self._services
+
+    @property
+    def speaker(self):
+        """
+        Return speaker
+        """
+        return self._speakerConfig

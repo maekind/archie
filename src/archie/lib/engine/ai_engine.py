@@ -22,6 +22,7 @@ from archie.lib.engine.speaker_engine import Speaker
 from archie.lib.engine.step import Step
 from archie.lib.actions.rae import RaeInterface
 from archie.services.service_interface import ServiceInterface
+from archie.lib.engine.speaker_engine import SpeakerEngine, SpeakerEngineNotFoundException
 from archie.utils.decorators import trace_info
 
 
@@ -58,6 +59,9 @@ class AIEngine():
         # Set to init state
         self._state = Step.LISTENING_NOT_ACTIVE
 
+        # Running
+        self._run = True
+
     def __repr__(self) -> str:
         """ Return a printed version """
         return f"{self.__class__.__name__}"
@@ -71,7 +75,7 @@ class AIEngine():
         ai_says = ""
         play = True
 
-        while(True):
+        while(self._run):
 
             if self._state == Step.LISTENING_NOT_ACTIVE:
                 self._logger.debug("Step: LISTENING_NOT_ACTIVE")
@@ -185,6 +189,12 @@ class AIEngine():
             elif self._state == Step.TRAINNING:
                 self._logger.debug("Step: TRAINNING")
 
+    def stop_engine(self):
+        """
+        Method to stop runnning 
+        """
+        self._run = False
+
     @trace_info("Loading corpus ...")
     def _initialize_corpus(self):
         """
@@ -229,7 +239,14 @@ class AIEngine():
         # Initialize speaker engine
         speaker_language = self._language.split(
             '-')[0] + "_" + str.upper(self._language.split('-')[1])
-        self._speaker = Speaker(speaker_language)
+
+        # Initializing speaker engine
+        if self._config.speaker.engine == SpeakerEngine.PYTTSX3:    
+            self._speaker = Speaker.init_pyttsx3_engine(speaker_language)
+        elif self._config.speaker.engine == SpeakerEngine.GTTS:
+            self._speaker = Speaker.init_gTTS_engine(speaker_language)
+        else:
+            raise SpeakerEngineNotFoundException()
 
         # Initialize speaker recognition
         self._speaker_recognition = SpeakerRecognition(

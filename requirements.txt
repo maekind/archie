@@ -11,6 +11,7 @@ pyyaml
 pyrae
 google-api-python-client
 google-cloud-speech
+gTTS
 oauth2client
 # For CNN:
 tensorflow
