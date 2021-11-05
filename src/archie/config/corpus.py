@@ -24,6 +24,9 @@ class Corpus():
         with open(self._corpus_file, "r") as cfile:
             self._corpus = json.load(cfile)
 
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}, corpus file: {self._corpus_file}"
+
     @property
     def corpus(self):
         """

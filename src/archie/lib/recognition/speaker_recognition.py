@@ -43,6 +43,10 @@ class SpeakerRecognition():
         self._model_path = model_path
         # Load models in initialization
         self._load_models()
+
+    def __repr__(self) -> str:
+        """ Return a printed version """
+        return f"{self.__class__.__name__}, models path: {self._model_path}"
         
     def find_speaker(self, audio_file):
         """

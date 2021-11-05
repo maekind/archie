@@ -44,6 +44,10 @@ class TrainModels():
         # Set number of samples to train per speaker
         self._num_samples = num_samples
 
+    def __repr__(self) -> str:
+        """ Return a printed version """
+        return f"{self.__class__.__name__}, samples path: {self._samples_path}, models path: {self._models_path}, samples: {self._num_samples}"
+
     def train(self) -> None:
         """
         Method to launch trainning

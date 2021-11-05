@@ -25,18 +25,34 @@ class Configuration():
         @conf_path: absolute conf path
         """
 
-        self.__loads(path.join(conf_path, 'config.yaml'), data_path, services_path)
+        # Set paths
+        self._conf_path = conf_path
+        self._data_path = data_path
+        self._services_path = services_path
 
-    def __loads(self, config_file, data_path, services_path):
+        # Loads configuration sections
+        self._loads()
+
+    def __repr__(self) -> str:
+        """ 
+        Return a printed version 
+        """
+        return f"{self.__class__.__name__}, conf path: {self._conf_path}, data path: {self._data_path}, services path: {self._services_path}"
+
+    def _loads(self):
         """
         Loads configuration data into config instansces
         """
-        config = yaml.load(open(config_file, 'r'), Loader=yaml.FullLoader)
+        config = yaml.load(
+            open(path.join(self._conf_path, 'config.yaml'), 'r'), Loader=yaml.FullLoader)
         self._info = Info(config["info"])
-        self._listenerConfig = ListenerConfig(config["listener"], data_path)
-        self._recognitionConfig = RecognitionConfig(config["recognition"], data_path)
-        self._actionsConfig = ActionsConfig(config["actions"], data_path)
-        self._services = ServicesConfig(config["services"], services_path)
+        self._listenerConfig = ListenerConfig(
+            config["listener"], self._data_path)
+        self._recognitionConfig = RecognitionConfig(
+            config["recognition"], self._data_path)
+        self._actionsConfig = ActionsConfig(config["actions"], self._data_path)
+        self._services = ServicesConfig(
+            config["services"], self._services_path)
 
     @property
     def info(self):

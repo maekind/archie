@@ -17,11 +17,15 @@ __status__ = "Development"
 
 class SpeakerVoiceException(Exception):
     """ Custom exception for voice manipulation """
-
+    def __repr__(self) -> str:
+        """ Return a printed version """
+        return f"{self.__class__.__name__}"
 
 class SpeakerVolumeException(Exception):
     """ Custom exception for volume manipulation """
-
+    def __repr__(self) -> str:
+        """ Return a printed version """
+        return f"{self.__class__.__name__}"
 
 class Speaker():
     """
@@ -35,7 +39,7 @@ class Speaker():
         """
         # Initialize logger name
         self._logger = logging.getLogger(self.__class__.__name__)
-        #self._logger.info("Initializing speaker engine ...")
+        
         # Initialize speaker engine
         self._speaker_engine = pyttsx3.init()
         # Set language
@@ -50,7 +54,9 @@ class Speaker():
         except SpeakerVoiceException as e:
             raise e
 
-        #self._logger.info("ok")
+    def __repr__(self) -> str:
+        """ Return a printed version """
+        return f"{self.__class__.__name__}, language: {self._language}, rate: {self._rate}, gender: {self._gender}"
 
     def _configure_voice(self):
         """

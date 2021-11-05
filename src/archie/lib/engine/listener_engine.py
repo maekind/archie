@@ -12,15 +12,21 @@ from archie.utils.decorators import trace_info
 
 class ListenerRecognizerException(Exception):
     """ Custom exception for recognizer """
-
+    def __repr__(self) -> str:
+        """ Return a printed version """
+        return f"{self.__class__.__name__}"
 
 class ListenerException(Exception):
     """ Custom exception for listener """
-
+    def __repr__(self) -> str:
+        """ Return a printed version """
+        return f"{self.__class__.__name__}"
 
 class ListenerTimeoutException(Exception):
     """ Custom exception for listener timeout """
-
+    def __repr__(self) -> str:
+        """ Return a printed version """
+        return f"{self.__class__.__name__}"
 
 class Listener():
     """
@@ -52,7 +58,9 @@ class Listener():
         # Set sounds path
         self._sounds_path = sounds_path
 
-        #self._logger.info("ok")
+    def __repr__(self) -> str:
+        """ Return a printed version """
+        return f"{self.__class__.__name__}, language: {self._language}, micro index: {self._micro_index}, audio rate: {self._audio_rate}"
 
     def listen(self, timeout=None, play_sound=True):
         """

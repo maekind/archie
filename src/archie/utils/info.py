@@ -21,6 +21,10 @@ class run_version_command(argparse.Action):
         print(__version__)
         sys.exit(0)
 
+    def __repr__(self) -> str:
+        """ Return a printed version """
+        return f"{self.__class__.__name__}"
+
 class run_info_command(argparse.Action):
     """ Class to print application information """
     def __call__(self, *args, **kwargs):
@@ -31,3 +35,7 @@ class run_info_command(argparse.Action):
         print(f"Status: {__status__}")
         print(f"License: {__license__}")
         sys.exit(0)
+
+    def __repr__(self) -> str:
+        """ Return a printed version """
+        return f"{self.__class__.__name__}"

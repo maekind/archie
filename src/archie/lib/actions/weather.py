@@ -21,9 +21,17 @@ class WeatherInterfaceRequestException(Exception):
     # Setting custom message
     message = "Weather request error. Code 404"
 
+    def __repr__(self) -> str:
+        """ Return a printed version """
+        return f"{self.__class__.__name__}"
+
 
 class WeatherInfoList(List):
     """ Class to handle a list of WeatherInfo items """
+
+    def __repr__(self) -> str:
+        """ Return a printed version """
+        return f"{self.__class__.__name__}"
 
 
 class WeatherInterface():
@@ -81,6 +89,10 @@ class WeatherInterface():
 
         # Set city
         self._city = city
+
+    def __repr__(self) -> str:
+        """ Return a printed version """
+        return f"{self.__class__.__name__}, city: {self._city}, language: {self._language}"
 
     def search(self) -> WeatherInfoList:
         """

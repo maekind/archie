@@ -18,6 +18,10 @@ class RaeInterface():
         """
         self._logger = logging.getLogger("RAE interface")
 
+    def __repr__(self) -> str:
+        """ Return a printed version """
+        return f"{self.__class__.__name__}"
+
     def search(self, word):
         """
         Method to search a word in the RAE dictionary

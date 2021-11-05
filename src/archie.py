@@ -8,7 +8,6 @@ import logging
 import argparse
 import sys
 import signal
-from os import path
 from archie.lib.engine.ai_engine import AIEngine
 from archie.services.spawn import SpawnServices
 from archie.utils.info import run_info_command, run_version_command, __application__
@@ -43,6 +42,9 @@ class ArchieLauncher():
         """
         Default constructor
         """
+        # Set logging level
+        self._logging_level = logging_level
+        
         # Configuring logger
         self._configure_logger(logging_level)
 
@@ -57,6 +59,12 @@ class ArchieLauncher():
 
         # Launch services
         self._launch_services()
+
+    def __repr__(self) -> str:
+        """ 
+        Return a printed version
+        """
+        return f"{self.__class__.__name__}, logging level: {self._logging_level}"
 
     def _configure_logger(self, level):
         """
@@ -119,20 +127,6 @@ class ArchieLauncher():
 
         raise ArchieSIGINTCatchedException()
 
-
-# Initialize archie to use under signal detection
-# archie:ArchieASR = None
-
-# def signal_handler(sig, frame):
-#         """
-#         Method to catch ctrl+c signal
-#         """
-#         print('Ctrl+C pressed!')
-#         # Stop all spawned services
-#         if archie:
-#             archie.stop_services()
-#         sys.exit(1)
-
 def main():
     """
     Main function
@@ -152,10 +146,7 @@ def main():
     args = parser.parse_args()
 
     try:
-        # TODO: Delete lines:
-        # Set signal handler to catch SIGINT
-        #signal.signal(signal.SIGINT, signal_handler)
-
+        
         # Archie instance initialization
         archie = ArchieLauncher(args.logging_level)
 

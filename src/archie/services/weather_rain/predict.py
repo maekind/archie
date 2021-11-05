@@ -48,6 +48,10 @@ class Predict():
         elif samples_file:
             self._sample = self._load_samples(samples_file)
 
+    def __repr__(self) -> str:
+        """ Return a printed version """
+        return f"{self.__class__.__name__}"
+
     def _load_tokenizer(self, tokenizer_file):
         """
         Method to load tokenizer

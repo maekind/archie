@@ -58,6 +58,10 @@ class AIEngine():
         # Set to init state
         self._state = Step.LISTENING_NOT_ACTIVE
 
+    def __repr__(self) -> str:
+        """ Return a printed version """
+        return f"{self.__class__.__name__}"
+
     @trace_info("Running AI Engine ...")
     def run(self):
         """

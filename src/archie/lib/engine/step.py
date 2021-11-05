@@ -23,3 +23,7 @@ class Step(Enum):
     SPEAKING = 5
     # Processing input speech
     PROCESSING = 6
+
+    def __repr__(self) -> str:
+        """ Return a printed version """
+        return f"{self.__class__.__name__}"

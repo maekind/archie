@@ -39,6 +39,10 @@ class SpeakerFeatures():
         # Initialize logger
         self._logger = logging.getLogger("Speaker Features")
 
+    def __repr__(self) -> str:
+        """ Return a printed version """
+        return f"{self.__class__.__name__}, rate: {self._rate}"
+
     def _calculate_delta(self, array):
         """
         Calculate and returns the delta of given feature vector matrix

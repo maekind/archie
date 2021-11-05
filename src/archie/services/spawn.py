@@ -42,6 +42,10 @@ class SpawnServices():
 
         # Initialize service main file name
         self._service_main_file = "service.py"
+    
+    def __repr__(self) -> str:
+        """ Return a printed version """
+        return f"{self.__class__.__name__}, services path: {self._services_path}"
 
     def run(self):
         """"

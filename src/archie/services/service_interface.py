@@ -24,6 +24,10 @@ class ServiceInterface:
         self._host, self._port = config
 
         self._url = f"http://{self._host}:{self._port}"
+
+    def __repr__(self) -> str:
+        """ Return a printed version """
+        return f"{self.__class__.__name__}, host: {self._host}, port: {self._port}"
         
     @property
     def Name(self):

@@ -50,6 +50,10 @@ class Train():
         self._epochs = 5  # How many times we pass over the trained data (Original 3)
         self._embedding_dim = embeddings_dim
 
+    def __repr__(self) -> str:
+        """ Return a printed version """
+        return f"{self.__class__.__name__}"
+
     def run(self):
         """
         Method to launch training
