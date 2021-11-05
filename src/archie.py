@@ -15,11 +15,16 @@ from archie.utils.info import run_info_command, run_version_command, __applicati
 from archie.config.base import Configuration
 from archie.utils.decorators import trace_info
 
-class ArchieASR():
+
+class ArchieSIGINTCatchedException(Exception):
+    """ Exception to handler SIGINT """
+
+
+class ArchieLauncher():
     """
     Archie ASR launcher class
     """
-  
+
     # Paths
     _data_path = r"/Users/marco/Documents/Proyectos/P017-Assistant/archie"
     _conf_path = r"/Users/marco/Documents/Proyectos/P017-Assistant/archie/src"
@@ -29,12 +34,12 @@ class ArchieASR():
     _signal_received = False
 
     # Instance initialization for spawning services
-    _services:SpawnServices = None
+    _services: SpawnServices = None
 
     # Initialize configuration instance
-    _config:Configuration = None
+    _config: Configuration = None
 
-    def __init__(self, logging_level, signal_func) -> None:
+    def __init__(self, logging_level) -> None:
         """
         Default constructor
         """
@@ -45,14 +50,13 @@ class ArchieASR():
         self._logger = logging.getLogger("Archie")
 
         # Set signal handler to catch SIGINT
-        signal.signal(signal.SIGINT, signal_func)
+        signal.signal(signal.SIGINT, self._signal_handler)
 
         # Getting configuration
         self._get_configuration()
 
         # Launch services
         self._launch_services()
-
 
     def _configure_logger(self, level):
         """
@@ -66,14 +70,13 @@ class ArchieASR():
 
         logging.basicConfig(**logargs)
 
-        
-
     @trace_info("Loading configuration file ...")
     def _get_configuration(self):
         """
         Function to get configuration instance
         """
-        self._config = Configuration(self._conf_path, self._data_path, self._services_path)
+        self._config = Configuration(
+            self._conf_path, self._data_path, self._services_path)
 
     @trace_info("Spawining services ...")
     def _launch_services(self):
@@ -99,38 +102,49 @@ class ArchieASR():
         archie.run()
 
     @trace_info("Stopping services ...")
-    def stop_services(self):
+    def _stop_services(self):
         """
         Method to stop all running services
         """
         if self._services:
             self._services.stop()
 
-# Initialize archie to use under signal detection
-archie:ArchieASR = None
-
-def signal_handler(sig, frame):
+    def _signal_handler(self, sig, frame):
         """
         Method to catch ctrl+c signal
         """
-        print('Ctrl+C pressed!')
+        self._logger.warning('Ctrl+C pressed!')
         # Stop all spawned services
-        if archie:
-            archie.stop_services()
-        sys.exit(1)
+        self._stop_services()
+
+        raise ArchieSIGINTCatchedException()
+
+
+# Initialize archie to use under signal detection
+# archie:ArchieASR = None
+
+# def signal_handler(sig, frame):
+#         """
+#         Method to catch ctrl+c signal
+#         """
+#         print('Ctrl+C pressed!')
+#         # Stop all spawned services
+#         if archie:
+#             archie.stop_services()
+#         sys.exit(1)
 
 def main():
     """
     Main function
     """
-    
+
     # Configure arguments
     parser = argparse.ArgumentParser(description=__application__)
     parser.add_argument('--version', nargs=0,
                         help=argparse.SUPPRESS, action=run_version_command)
     parser.add_argument('-i', '--info', nargs=0,
                         help="show application information", action=run_info_command)
-    parser.add_argument('-l', 
+    parser.add_argument('-l',
                         '--logging_level',
                         default='DEBUG',
                         help="set logging level to one of the following values: [DEBUG, INFO, WARNING, ERROR, CRITICAL]")
@@ -138,26 +152,28 @@ def main():
     args = parser.parse_args()
 
     try:
-        
+        # TODO: Delete lines:
         # Set signal handler to catch SIGINT
         #signal.signal(signal.SIGINT, signal_handler)
 
         # Archie instance initialization
-        archie = ArchieASR(args.logging_level, signal_handler)
+        archie = ArchieLauncher(args.logging_level)
 
         # Launching Archie
         archie.run()
-        
+
+    except ArchieSIGINTCatchedException:
+        logger = logging.getLogger()
+        logger.warning("Exiting program ...")
+
     except Exception as e:
         if e is not None:
             logger = logging.getLogger()
             logger.error(e)
             if archie:
                 archie.stop_services()
-
-            sys.exit(1)
-
-    sys.exit(0)
+    finally:
+        sys.exit(0)
 
 
 if __name__ == "__main__":

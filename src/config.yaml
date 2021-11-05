@@ -10,7 +10,7 @@ listener:
   language: 'es-es'
   audio_rate: 16000
   adjust_for_noise: True
-  microphone_index: 1
+  microphone_index: 2
   timeout: 10
   sounds_path: 'data/sounds'
   google_cloud_credentials: 'data/conf/google_cloud.json'
