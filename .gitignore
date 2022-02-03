@@ -13,6 +13,7 @@ data/conf/readme
 standalone.sh
 SBW-vectors-300-min5.*
 *.pdf
+uml/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

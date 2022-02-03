@@ -472,12 +472,12 @@ if __name__ == "__main__":
         weatherInfo = weather.search()
 
         # Iter weather info
-        for weaterItem in weatherInfo:
-            if isinstance(weaterItem, WeatherInfoCurrent):
+        for weatherItem in weatherInfo:
+            if isinstance(weatherItem, WeatherInfoCurrent):
                 logging.debug("Weather item current")
                 pass
-            elif isinstance(weaterItem, WeatherInfoDay):
+            elif isinstance(weatherItem, WeatherInfoDay):
                 logging.debug("Weather item day")
-                print(weaterItem)
+                print(weatherItem)
     except Exception as e:
         logging.error(e.message)

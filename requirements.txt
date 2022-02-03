@@ -1,7 +1,13 @@
 pyttsx3
 numpy
+matplotlib
+pytest
+pybind11
+pythran
+compilers
 scipy
 sklearn
+pandas
 python_speech_features
 SpeechRecognition
 pyaudio
@@ -16,8 +22,6 @@ oauth2client
 # For CNN:
 tensorflow
 keras
-pandas
-matplotlib
 dill
 # For Fastapi
 fastapi

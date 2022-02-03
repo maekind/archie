@@ -5,9 +5,10 @@ speaker_engine.py - File that contains speaker class
 
 import pyttsx3
 import logging
+import tempfile
+from os import remove
 from enum import Enum
 from gtts import gTTS
-from io import BytesIO
 from playsound import playsound
 from archie.utils.decorators import trace_info
 
@@ -169,21 +170,27 @@ class Speaker():
         """
         # pyttsx3 engine
         if self._engine == SpeakerEngine.PYTTSX3:
+            # Play sound
             self._speaker_engine.say(something)
             self._speaker_engine.runAndWait()
         # gTTS engine
         elif self._engine == SpeakerEngine.GTTS:
-            #mp3_fp = BytesIO()
+            # Performs text to speech
             tts = gTTS(something, lang=self._language)
-            #tts.write_to_fp(mp3_fp)
-            import tempfile
-
+            
+            # Get temporary mp3 file
             temp = tempfile.NamedTemporaryFile(suffix='.mp3', delete=False)
+            
+            # Save sound encoded in a temporary file
             with open(temp.name, "wb") as mp3_file:
                 tts.write_to_fp(mp3_file)
             
+            # Play sound
             playsound(temp.name)
-            # TODO: remove file
+            
+            # Remove temporary file
+            remove(temp.name)
+            
                 
                 
 

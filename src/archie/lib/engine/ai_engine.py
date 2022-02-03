@@ -368,15 +368,16 @@ class AIEngine():
         weatherInfo = weather.search()
 
         # Iter weather info
-        for weaterItem in weatherInfo:
-            if isinstance(weaterItem, WeatherInfoCurrent):
+        for weatherItem in weatherInfo:
+            if isinstance(weatherItem, WeatherInfoCurrent):
                 logging.debug("Weather item current")
 
-            elif isinstance(weaterItem, WeatherInfoDay):
+            elif isinstance(weatherItem, WeatherInfoDay):
                 logging.debug("Weather item day")
-                print(weaterItem)
+                print(weatherItem)
 
     def _time_action(self):
         """
         Method to get actual time
         """
+        self._logger.warning("Service not implemented yet!")
