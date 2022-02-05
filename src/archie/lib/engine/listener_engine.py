@@ -8,7 +8,7 @@ import speech_recognition as sr
 from os import path
 from playsound import playsound
 from archie.utils.decorators import trace_info
-
+from archie.utils.statistics import SpeechToTextStats
 
 class ListenerRecognizerException(Exception):
     """ Custom exception for recognizer """
@@ -34,7 +34,7 @@ class Listener():
     """
 
     @trace_info("Initializing listener engine ...")
-    def __init__(self, microphone_index, audio_rate, adjust_for_noise, sounds_path, language="es-es") -> None:
+    def __init__(self, microphone_index, audio_rate, adjust_for_noise, sounds_path, db_path, language="es-es") -> None:
         """
         Default constructor
         """
@@ -57,6 +57,10 @@ class Listener():
         self._adjust_for_noise = adjust_for_noise
         # Set sounds path
         self._sounds_path = sounds_path
+        # Set database path
+        self._db_path = db_path
+        # Initialize statics datababase connection
+        self._stats = SpeechToTextStats(self._db_path, "statistics.db")
 
     def __repr__(self) -> str:
         """ Return a printed version """
@@ -93,18 +97,27 @@ class Listener():
                 audio, language=self._language)
             self._logger.debug(f"Someone said {query}")
 
+            # Saving stats
+            self._stats.update(query)
+
+            # Fetch current month requests
+            try:
+                requests = self._stats.get_current_month_requests()
+                self._logger.debug(f"Current month requests: {requests}/240")
+            except:
+                self._logger.error(f"Unable to fetch requests stats from database")
+                
         except sr.RequestError as e:
             self._logger.error(f"Request error: {e}")
         except sr.UnknownValueError as e:
             self._logger.error(f"Unknown value error: {e}")
         except Exception as e:
             raise ListenerRecognizerException(
-                f"Unable to recognize your voice: {e}")
+                f"Recognition error: {e}")
 
         audio.sample_rate = self._audio_rate
         return query.strip(), audio
-
-
+  
 # Troubleshooting
 # The recognizer tries to recognize speech even when I’m not speaking, or after I’m done speaking.
 # Try increasing the recognizer_instance.energy_threshold property. This is basically how sensitive the recognizer is to when recognition should start. Higher values mean that it will be less sensitive, which is useful if you are in a loud room.

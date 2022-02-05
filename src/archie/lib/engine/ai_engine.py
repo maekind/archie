@@ -213,10 +213,12 @@ class AIEngine():
         """
         method to initialize listener
         """
+        # TODO: db_path has to be passed as argument. Maybe as a global config section for database
         # Initialize listener engine
         self._listener = Listener(self._config.listener.microphone_index,
                                   self._config.listener.audio_rate, self._config.listener.adjust_for_noise,
-                                  self._config.listener.sounds_path, self._config.listener.language)
+                                  self._config.listener.sounds_path, r"/Users/marco/Documents/Proyectos/P017-Assistant/archie/data/db", 
+                                  self._config.listener.language)
         # Set listener timeout
         self._listener_timeout = self._config.listener.timeout
 

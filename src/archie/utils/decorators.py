@@ -24,6 +24,20 @@ def trace_info(message):
         return wrapper
     return decorator
 
+def trace_debug(message):
+    """ trace logging debug decorator """
+    def decorator(func):
+        """ decorator for function """
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            """ wrapper for the decorator """
+            logger = logging.getLogger(str(func.__qualname__).split('.')[0])
+            logger.debug(f"{message}")
+            res = func(*args, **kwargs)
+            logger.debug("ok")
+            return res
+        return wrapper
+    return decorator
 
 def execution_time(func):
     """ calculates function time execution """
