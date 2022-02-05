@@ -3,8 +3,8 @@
 statistics.py - File that contains database statistics interface
 """
 
-from abc import ABC, abstractmethod
-from datetime import date, datetime
+from abc import ABC
+from datetime import datetime
 from os import path
 from archie.utils.database import Database
 
