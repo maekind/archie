@@ -5,6 +5,9 @@ listener_engine.py - File that contains listener class
 
 import logging
 import speech_recognition as sr
+import requests
+from typing import Text, Tuple
+from urllib import parse
 from os import path
 from playsound import playsound
 from archie.utils.decorators import trace_info
@@ -97,15 +100,30 @@ class Listener():
                 audio, language=self._language)
             self._logger.debug(f"Someone said {query}")
 
+            # TODO: Make it trow the service interface
             # Saving stats
-            self._stats.update(query)
-
-            # Fetch current month requests
-            try:
-                requests = self._stats.get_current_month_requests()
-                self._logger.debug(f"Current month requests: {requests}/240")
-            except:
+            parameter = parse.quote_plus(query)
+            res = requests.get(f"http://localhost:30153/stats/requests/update/{parameter}")
+            if res.json().get('res') == "0":
+                self._logger.debug("Requests updated succesfully in to the database")
+            res = requests.get(f"http://localhost:30153/stats/requests/getcurrent")
+            
+            response = res.json()
+            if response.get("res") == "0":
+                self._logger.debug(f"Current month requests: {response.get('val')}/240")
+            else:
                 self._logger.error(f"Unable to fetch requests stats from database")
+
+
+            # # Saving stats
+            # self._stats.update(query)
+
+            # # Fetch current month requests
+            # try:
+            #     requests = self._stats.get_current_month_requests()
+            #     self._logger.debug(f"Current month requests: {requests}/240")
+            # except:
+            #     self._logger.error(f"Unable to fetch requests stats from database")
                 
         except sr.RequestError as e:
             self._logger.error(f"Request error: {e}")

@@ -52,7 +52,8 @@ class SpawnServices():
         Method to launch spawn function
         """
         for service, config in self._services.items():
-            self._spawn_service(service, config)
+            if config.get("enabled"):
+                self._spawn_service(service, config)
 
     def stop(self):
         """

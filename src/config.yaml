@@ -36,6 +36,12 @@ services:
     weather_rain:
       host: 'localhost'
       port: 30152
+      enabled: True
+    monitor:
+      host: 'localhost'
+      port: 30153
+      enabled: True
+      
 
 
 
